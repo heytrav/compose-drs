@@ -2,5 +2,8 @@ version: "2"
 services:
     centralnic:
         image: nodepp:latest
+        command: ["node", "./lib/node-epp-server.js", "-j", "-f", "epp-centralnic.json", "-r", "centralnic-test"]
+        volumes:
+            - ~/workspace/innovation/nodepp/config:/opt/project/node-epp/config
 
 
