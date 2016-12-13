@@ -5,5 +5,7 @@ services:
         command: ["node", "./lib/node-epp-server.js", "-j", "-f", "epp-centralnic.json", "-r", "centralnic-test"]
         volumes:
             - ~/workspace/innovation/nodepp/config:/opt/project/node-epp/config
+        ports:
+            - "3000:3000"
 
 
