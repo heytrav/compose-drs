@@ -2,11 +2,22 @@ version: "2"
 services:
     centralnic:
         image: nodepp:latest
-        command: ["node", "./lib/node-epp-server.js", "-j", "-f", "epp-centralnic.json", "-r", "centralnic-test"]
+        command: ["node", "./lib/node-epp-restful.js", "-j", "-f", "epp-centralnic.json", "-r", "centralnic-test", "--loglevel", "debug"]
         volumes:
             - ~/workspace/innovation/nodepp/config:/opt/project/node-epp/config
         ports:
             - "3000:3000"
+    api:
+        image: domain-api
+        ports:
+            - "8000:8000"
+        volumes:
+            - ~/workspace/innovation/database/sqlite3:/var/domain-api/db
+            - ~/workspace/innovation/domain-api/catalystinnovation:/usr/local/domain-api/catalystinnovation
+        command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+        env_file: .env
+        links:
+            - centralnic
     #data:
         #restart: "no"
         #image: postgres:latest
