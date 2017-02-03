@@ -53,6 +53,11 @@ services:
       - centralnic_test_login
       - centralnic_test_password
       - centralnic_test_config
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://logstash:12201
+        tag: centralnic
     deploy:
       restart_policy:
         condition: on-failure
@@ -97,6 +102,22 @@ services:
       restart_policy:
         condition: on-failure
         delay: 10s
+
+  elasticsearch:
+    image: elasticsearch
+
+  logstash:
+    image: logstash
+    links:
+      - elasticsearch
+    volumes:
+      - ./logstash/logstash.conf:/config-dir/logstash.conf
+    command: ["logstash", "-f", "/config-dir/logstash.conf"]
+
+  kibana:
+    image: kibana
+    links:
+      - elasticsearch
 
 secrets:
   cocca_test_login:
