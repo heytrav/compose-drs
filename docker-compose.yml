@@ -11,7 +11,7 @@ services:
     image: quay.io/heytrav/nodepp:latest
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "epp-centralnic.json", "-r", "centralnic-test", "--loglevel", "debug"]
     volumes:
-      - ~/workspace/innovation/nodepp:/opt/project/node-epp
+      - ../nodepp:/opt/project/node-epp
     links:
       - rabbitmq:rabbitmq
     depends_on:
@@ -22,9 +22,11 @@ services:
     image: domain-api
     ports:
       - "8000:8000"
+    environment:
+      - SQLITE_DIR=/var/domain-api/db
     volumes:
-      - ~/workspace/innovation/database/sqlite3:/var/domain-api/db
-      - ~/workspace/innovation/domain-api/catalystinnovation:/usr/local/domain-api/catalystinnovation
+      - ../database/sqlite3:/var/domain-api/db
+      - ../drs-project/catalystinnovation:/usr/local/domain-api/catalystinnovation
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
     depends_on:
       - rabbitmq
