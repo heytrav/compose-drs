@@ -26,7 +26,7 @@ services:
       - SQLITE_DIR=/var/domain-api/db
     volumes:
       - ../database/sqlite3:/var/domain-api/db
-      - ../drs-project/catalystinnovation:/usr/local/domain-api/catalystinnovation
+      - ../drs-project:/usr/local/domain-api/catalystinnovation
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
     depends_on:
       - rabbitmq
