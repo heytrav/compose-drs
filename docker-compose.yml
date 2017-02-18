@@ -5,7 +5,22 @@ services:
     image: rabbitmq:3-management
     ports:
       - 15672:15672
+      - 5672:5672
     env_file: .env
+
+  celery:
+    image: domain-api
+    environment:
+      - SQLITE_DIR=/var/domain-api/db
+    volumes:
+      - ../database/sqlite3:/var/domain-api/db
+      - ../drs-project:/usr/local/domain-api
+    command: ["celery", "-A", "application", "worker", "-l", "info"]
+    depends_on:
+      - rabbitmq
+    env_file: .env
+    links:
+      - rabbitmq:rabbitmq
 
   centralnic:
     image: quay.io/heytrav/nodepp:latest
