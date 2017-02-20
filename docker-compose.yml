@@ -8,6 +8,14 @@ services:
       - 5672:5672
     env_file: .env
 
+  domaindb:
+    image: mariadb
+    env_file: .env
+    ports:
+      - 3306:3306
+    volumes:
+      - ../database/mysql:/var/lib/mysql
+
   celery:
     image: domain-api
     environment:
@@ -45,6 +53,8 @@ services:
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
     depends_on:
       - rabbitmq
+      - domaindb
     env_file: .env
     links:
       - rabbitmq:rabbitmq
+      - domaindb:domaindb
