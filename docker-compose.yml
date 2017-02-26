@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
 
   rabbitmq:
@@ -17,7 +17,7 @@ services:
       - ../database/mysql:/var/lib/mysql
 
   celery:
-    image: domain-api
+    image: quay.io/heytrav/domain-api:latest
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["celery", "-A", "application", "worker", "-l", "info"]
@@ -26,10 +26,15 @@ services:
     env_file: .env
     links:
       - rabbitmq:rabbitmq
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
 
   centralnic:
     image: quay.io/heytrav/nodepp:latest
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "epp-centralnic.json", "-r", "centralnic-test", "--loglevel", "debug"]
+    #command: ["ls", "-a", "$NODE_PATH"]
     volumes:
       - ../nodepp:/opt/project/node-epp
     links:
@@ -37,9 +42,13 @@ services:
     depends_on:
       - rabbitmq
     env_file: .env
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
 
   api:
-    image: domain-api
+    image: quay.io/heytrav/domain-api:latest
     ports:
       - "8000:8000"
     environment:
@@ -55,3 +64,7 @@ services:
     links:
       - rabbitmq:rabbitmq
       - domaindb:domaindb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
