@@ -1,4 +1,4 @@
-version: "3"
+version: "3.1"
 services:
 
   rabbitmq:
@@ -24,8 +24,6 @@ services:
     depends_on:
       - rabbitmq
     env_file: .env
-    #links:
-      #- rabbitmq:rabbitmq
     deploy:
       restart_policy:
         condition: on-failure
@@ -34,11 +32,8 @@ services:
   centralnic:
     image: quay.io/heytrav/nodepp:latest
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "epp-centralnic.json", "-r", "centralnic-test", "--loglevel", "debug"]
-    #command: ["ls", "-a", "$NODE_PATH"]
     volumes:
       - ../nodepp:/opt/project/node-epp
-    #links:
-      #- rabbitmq:rabbitmq
     depends_on:
       - rabbitmq
     env_file: .env
@@ -50,11 +45,8 @@ services:
   cocca:
     image: quay.io/heytrav/nodepp:latest
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "epp-cocca-test.json", "-r", "cocca-test", "--loglevel", "debug"]
-    #command: ["ls", "-a", "$NODE_PATH"]
     volumes:
       - ../nodepp:/opt/project/node-epp
-    #links:
-      #- rabbitmq:rabbitmq
     depends_on:
       - rabbitmq
     env_file: .env
@@ -76,9 +68,6 @@ services:
       - rabbitmq
       - domaindb
     env_file: .env
-    #links:
-      #- rabbitmq:rabbitmq
-      #- domaindb:domaindb
     deploy:
       restart_policy:
         condition: on-failure
