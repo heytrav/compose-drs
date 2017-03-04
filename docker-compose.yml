@@ -2,14 +2,14 @@ version: "3"
 services:
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: quay.io/heytrav/rabbitmq:latest
     ports:
       - 15672:15672
       - 5672:5672
     env_file: .env
 
   domaindb:
-    image: mariadb
+    image: quay.io/heytrav/mariadb
     env_file: .env
     ports:
       - 3306:3306
@@ -24,8 +24,8 @@ services:
     depends_on:
       - rabbitmq
     env_file: .env
-    links:
-      - rabbitmq:rabbitmq
+    #links:
+      #- rabbitmq:rabbitmq
     deploy:
       restart_policy:
         condition: on-failure
@@ -37,8 +37,24 @@ services:
     #command: ["ls", "-a", "$NODE_PATH"]
     volumes:
       - ../nodepp:/opt/project/node-epp
-    links:
-      - rabbitmq:rabbitmq
+    #links:
+      #- rabbitmq:rabbitmq
+    depends_on:
+      - rabbitmq
+    env_file: .env
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+
+  cocca:
+    image: quay.io/heytrav/nodepp:latest
+    command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "epp-cocca-test.json", "-r", "cocca-test", "--loglevel", "debug"]
+    #command: ["ls", "-a", "$NODE_PATH"]
+    volumes:
+      - ../nodepp:/opt/project/node-epp
+    #links:
+      #- rabbitmq:rabbitmq
     depends_on:
       - rabbitmq
     env_file: .env
@@ -54,16 +70,15 @@ services:
     environment:
       - SQLITE_DIR=/var/domain-api/db
     volumes:
-      - ../database/sqlite3:/var/domain-api/db
       - ../drs-project:/usr/local/domain-api
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
     depends_on:
       - rabbitmq
       - domaindb
     env_file: .env
-    links:
-      - rabbitmq:rabbitmq
-      - domaindb:domaindb
+    #links:
+      #- rabbitmq:rabbitmq
+      #- domaindb:domaindb
     deploy:
       restart_policy:
         condition: on-failure
