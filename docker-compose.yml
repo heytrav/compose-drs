@@ -1,4 +1,4 @@
-version: "3"
+version: "3.1"
 services:
 
   rabbitmq:
@@ -9,8 +9,13 @@ services:
     env_file: .env
 
   domaindb:
-    image: quay.io/heytrav/mariadb
+    image: mariadb:10.1.21
     env_file: .env
+    secrets:
+      - mysql_password
+      - mysql_root_password
+      - mysql_database
+      - mysql_user
     ports:
       - 3306:3306
     volumes:
@@ -24,8 +29,10 @@ services:
     depends_on:
       - rabbitmq
     env_file: .env
-    #links:
-      #- rabbitmq:rabbitmq
+    secrets:
+      - mysql_database
+      - mysql_user
+      - mysql_password
     deploy:
       restart_policy:
         condition: on-failure
@@ -34,14 +41,17 @@ services:
   centralnic:
     image: quay.io/heytrav/nodepp:latest
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "epp-centralnic.json", "-r", "centralnic-test", "--loglevel", "debug"]
-    #command: ["ls", "-a", "$NODE_PATH"]
     volumes:
       - ../nodepp:/opt/project/node-epp
-    #links:
-      #- rabbitmq:rabbitmq
     depends_on:
       - rabbitmq
     env_file: .env
+    environment:
+      EPP_LOGIN_FILE: /run/secrets/centralnic_test_login
+      EPP_PASSWORD_FILE: /run/secrets/centralnic_test_password
+    secrets:
+      - centralnic_test_login
+      - centralnic_test_password
     deploy:
       restart_policy:
         condition: on-failure
@@ -50,14 +60,17 @@ services:
   cocca:
     image: quay.io/heytrav/nodepp:latest
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "epp-cocca-test.json", "-r", "cocca-test", "--loglevel", "debug"]
-    #command: ["ls", "-a", "$NODE_PATH"]
     volumes:
       - ../nodepp:/opt/project/node-epp
-    #links:
-      #- rabbitmq:rabbitmq
     depends_on:
       - rabbitmq
     env_file: .env
+    environment:
+      EPP_LOGIN_FILE: /run/secrets/cocca_test_login
+      EPP_PASSWORD_FILE: /run/secrets/cocca_test_password
+    secrets:
+      - cocca_test_login
+      - cocca_test_password
     deploy:
       restart_policy:
         condition: on-failure
@@ -76,10 +89,27 @@ services:
       - rabbitmq
       - domaindb
     env_file: .env
-    #links:
-      #- rabbitmq:rabbitmq
-      #- domaindb:domaindb
+    secrets:
+      - mysql_database
+      - mysql_user
+      - mysql_password
     deploy:
       restart_policy:
         condition: on-failure
         delay: 10s
+
+secrets:
+  cocca_test_login:
+    external: true
+  cocca_test_password:
+    external: true
+  centralnic_test_login:
+    external: true
+  centralnic_test_password:
+    external: true
+  mysql_root_password:
+    external: true
+  mysql_password:
+    external: true
+  mysql_database:
+    external: true
