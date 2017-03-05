@@ -78,6 +78,11 @@ services:
       - cocca_test_login
       - cocca_test_password
       - cocca_test_config
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://logstash:12201
+        tag: centralnic
     deploy:
       restart_policy:
         condition: on-failure
@@ -98,6 +103,11 @@ services:
       - mysql_database
       - mysql_user
       - mysql_password
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://logstash:12201
+        tag: centralnic
     deploy:
       restart_policy:
         condition: on-failure
@@ -112,6 +122,13 @@ services:
     image: docker.elastic.co/logstash/logstash:5.2.2
     volumes:
       - ./logstash/logstash.conf:/usr/share/logstash/pipeline/
+    ports:
+      - 12201:12201
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://logstash:12201
+        tag: centralnic
 
   kibana:
     image: docker.elastic.co/elasticsearch/kibana:5.2.2
