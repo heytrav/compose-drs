@@ -104,20 +104,17 @@ services:
         delay: 10s
 
   elasticsearch:
-    image: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    ports:
+      - 9200:9200
 
   logstash:
-    image: logstash
-    links:
-      - elasticsearch
+    image: docker.elastic.co/logstash/logstash:5.2.2
     volumes:
-      - ./logstash/logstash.conf:/config-dir/logstash.conf
-    command: ["logstash", "-f", "/config-dir/logstash.conf"]
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/
 
   kibana:
-    image: kibana
-    links:
-      - elasticsearch
+    image: docker.elastic.co/elasticsearch/kibana:5.2.2
 
 secrets:
   cocca_test_login:
