@@ -52,12 +52,11 @@ services:
     environment:
       EPP_LOGIN_FILE: /run/secrets/centralnic_test_login
       EPP_PASSWORD_FILE: /run/secrets/centralnic_test_password
-      SENTRY_DSN_FILE: /run/secrets/centralnic_sentry_dsn
     secrets:
       - centralnic_test_login
       - centralnic_test_password
       - centralnic_test_config
-      - centralnic_sentry_dsn
+      - nodepp_sentry_dsn
     deploy:
       restart_policy:
         condition: on-failure
@@ -74,12 +73,11 @@ services:
     environment:
       EPP_LOGIN_FILE: /run/secrets/cocca_test_login
       EPP_PASSWORD_FILE: /run/secrets/cocca_test_password
-      SENTRY_DSN_FILE: /run/secrets/cocca_sentry_dsn
     secrets:
       - cocca_test_login
       - cocca_test_password
       - cocca_test_config
-      - cocca_sentry_dsn
+      - nodepp_sentry_dsn
     deploy:
       restart_policy:
         condition: on-failure
@@ -129,11 +127,9 @@ secrets:
     external: true
   cocca_test_config:
     external: true
-  centralnic_sentry_dsn:
-    external: true
-  cocca_sentry_dsn:
-    external: true
   celery_sentry_dsn:
     external: true
   domain_api_sentry_dsn:
+    external: true
+  nodepp_sentry_dsn:
     external: true
