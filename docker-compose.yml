@@ -85,8 +85,6 @@ services:
 
   api:
     image: quay.io/heytrav/domain-api:latest
-    ports:
-      - "8000:8000"
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
@@ -101,6 +99,19 @@ services:
       - mysql_user
       - mysql_password
       - domain_api_sentry_dsn
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+
+  nginx:
+    image: quay.io/heytrav/nginx:latest
+    ports:
+      - "3000:443"
+    secrets:
+      - site.key
+      - site.crt
+    command: ["nginx"]
     deploy:
       restart_policy:
         condition: on-failure
@@ -132,4 +143,8 @@ secrets:
   domain_api_sentry_dsn:
     external: true
   nodepp_sentry_dsn:
+    external: true
+  site.key:
+    external: true
+  site.crt:
     external: true
