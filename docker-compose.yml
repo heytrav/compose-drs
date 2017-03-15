@@ -5,7 +5,6 @@ services:
     image: quay.io/heytrav/rabbitmq:latest
     ports:
       - 15672:15672
-      - 5672:5672
     env_file: .env
 
   domaindb:
@@ -105,7 +104,7 @@ services:
         delay: 10s
 
   nginx:
-    image: quay.io/heytrav/nginx:latest
+    image: quay.io/heytrav/drs-nginx:latest
     ports:
       - "3000:443"
     secrets:
