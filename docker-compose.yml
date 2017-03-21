@@ -21,7 +21,7 @@ services:
       - ../database/mysql:/var/lib/mysql
 
   celery:
-    image: quay.io/heytrav/domain-api:latest
+    image: quay.io/heytrav/domain-api:jwt
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["celery", "-A", "application", "worker", "-l", "info"]
@@ -35,6 +35,8 @@ services:
       - mysql_user
       - mysql_password
       - celery_sentry_dsn
+      - django_secret_key
+      - jwt_secret_key
     deploy:
       restart_policy:
         condition: on-failure
@@ -83,7 +85,7 @@ services:
         delay: 10s
 
   api:
-    image: quay.io/heytrav/domain-api:latest
+    image: quay.io/heytrav/domain-api:jwt
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
@@ -98,6 +100,8 @@ services:
       - mysql_user
       - mysql_password
       - domain_api_sentry_dsn
+      - django_secret_key
+      - jwt_secret_key
     deploy:
       restart_policy:
         condition: on-failure
@@ -106,7 +110,7 @@ services:
   nginx:
     image: quay.io/heytrav/drs-nginx:latest
     ports:
-      - "3000:443"
+      - "443:443"
     secrets:
       - site.key
       - site.crt
@@ -146,4 +150,8 @@ secrets:
   site.key:
     external: true
   site.crt:
+    external: true
+  django_secret_key:
+    external: true
+  jwt_secret_key:
     external: true
