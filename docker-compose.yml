@@ -21,7 +21,7 @@ services:
       - ../database/mysql:/var/lib/mysql
 
   celery:
-    image: quay.io/heytrav/domain-api:0.1.6
+    image: quay.io/heytrav/domain-api:0.1.7
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["celery", "-A", "application", "worker", "-l", "info"]
@@ -85,7 +85,7 @@ services:
         delay: 10s
 
   api:
-    image: quay.io/heytrav/domain-api:0.1.6
+    image: quay.io/heytrav/domain-api:0.1.7
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
@@ -120,7 +120,7 @@ services:
           memory: 64M
 
   nginx:
-    image: quay.io/heytrav/drs-nginx:latest
+    image: quay.io/heytrav/drs-nginx:0.1.0
     ports:
       - "443:443"
     secrets:
