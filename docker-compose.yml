@@ -21,7 +21,7 @@ services:
       - ../database/mysql:/var/lib/mysql
 
   celery:
-    image: quay.io/heytrav/domain-api:0.1.7
+    image: quay.io/heytrav/domain-api:0.1.9
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["celery", "-A", "application", "worker", "-l", "info"]
@@ -43,7 +43,7 @@ services:
         delay: 10s
 
   centralnic:
-    image: quay.io/heytrav/nodepp:latest
+    image: quay.io/heytrav/nodepp:1.1.1
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
     volumes:
       - ../nodepp:/opt/project/node-epp
@@ -63,8 +63,32 @@ services:
         condition: on-failure
         delay: 10s
 
+
+  #nzrs:
+    #image: quay.io/heytrav/nodepp:1.1.1
+    #command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
+    #volumes:
+      #- ../nodepp:/opt/project/node-epp
+    #depends_on:
+      #- rabbitmq
+    #env_file: .env
+    #environment:
+      #EPP_LOGIN_FILE: /run/secrets/nzrs_test_login
+      #EPP_PASSWORD_FILE: /run/secrets/nzrs_test_password
+    #secrets:
+      #- nzrs_test_login
+      #- nzrs_test_password
+      #- nzrs_test_config
+      #- nodepp_sentry_dsn
+      #- nzrs-epp-test.pem
+      #- nzrs-epp-test.key
+    #deploy:
+      #restart_policy:
+        #condition: on-failure
+        #delay: 10s
+
   cocca:
-    image: quay.io/heytrav/nodepp:latest
+    image: quay.io/heytrav/nodepp:1.1.1
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
     volumes:
       - ../nodepp:/opt/project/node-epp
@@ -85,7 +109,7 @@ services:
         delay: 10s
 
   api:
-    image: quay.io/heytrav/domain-api:0.1.7
+    image: quay.io/heytrav/domain-api:0.1.9
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
@@ -166,4 +190,14 @@ secrets:
   django_secret_key:
     external: true
   jwt_secret_key:
+    external: true
+  nzrs_test_login:
+    external: true
+  nzrs_test_password:
+    external: true
+  nzrs_test_config:
+    external: true
+  nzrs-epp-test.pem:
+    external: true
+  nzrs-epp-test.key:
     external: true
