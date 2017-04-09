@@ -21,7 +21,7 @@ services:
       - ../database/mysql:/var/lib/mysql
 
   celery:
-    image: quay.io/heytrav/domain-api:0.1.9
+    image: quay.io/heytrav/domain-api:0.1.14
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["celery", "-A", "application", "worker", "-l", "info"]
@@ -37,13 +37,14 @@ services:
       - celery_sentry_dsn
       - django_secret_key
       - jwt_secret_key
+      - logzio_token
     deploy:
       restart_policy:
         condition: on-failure
         delay: 10s
 
   centralnic:
-    image: quay.io/heytrav/nodepp:1.1.1
+    image: quay.io/heytrav/nodepp:1.1.2
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
     volumes:
       - ../nodepp:/opt/project/node-epp
@@ -58,6 +59,7 @@ services:
       - centralnic_test_password
       - centralnic_test_config
       - nodepp_sentry_dsn
+      - logzio_token
     deploy:
       restart_policy:
         condition: on-failure
@@ -88,7 +90,7 @@ services:
         #delay: 10s
 
   cocca:
-    image: quay.io/heytrav/nodepp:1.1.1
+    image: quay.io/heytrav/nodepp:1.1.2
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
     volumes:
       - ../nodepp:/opt/project/node-epp
@@ -103,13 +105,34 @@ services:
       - cocca_test_password
       - cocca_test_config
       - nodepp_sentry_dsn
+      - logzio_token
     deploy:
       restart_policy:
         condition: on-failure
         delay: 10s
 
+  migrate:
+    image: quay.io/heytrav/domain-api:0.1.14
+    command: ["python3", "manage.py", "migrate"]
+    depends_on:
+      - domaindb
+    env_file: .env
+    environment:
+      SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
+    secrets:
+      - mysql_database
+      - mysql_user
+      - mysql_password
+      - django_secret_key
+      - jwt_secret_key
+      - logzio_token
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 1
+
   api:
-    image: quay.io/heytrav/domain-api:0.1.9
+    image: quay.io/heytrav/domain-api:0.1.14
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
@@ -126,6 +149,7 @@ services:
       - domain_api_sentry_dsn
       - django_secret_key
       - jwt_secret_key
+      - logzio_token
     deploy:
       restart_policy:
         condition: on-failure
@@ -200,4 +224,6 @@ secrets:
   nzrs-epp-test.pem:
     external: true
   nzrs-epp-test.key:
+    external: true
+  logzio_token:
     external: true
