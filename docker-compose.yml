@@ -21,7 +21,7 @@ services:
       - ../database/mysql:/var/lib/mysql
 
   celery:
-    image: quay.io/heytrav/domain-api:0.1.16
+    image: quay.io/heytrav/domain-api:0.1.18
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["celery", "-A", "application", "worker", "-l", "info"]
@@ -112,7 +112,7 @@ services:
         delay: 10s
 
   migrate:
-    image: quay.io/heytrav/domain-api:0.1.16
+    image: quay.io/heytrav/domain-api:0.1.18
     command: ["python3", "manage.py", "migrate"]
     depends_on:
       - domaindb
@@ -132,7 +132,7 @@ services:
         max_attempts: 1
 
   api:
-    image: quay.io/heytrav/domain-api:0.1.16
+    image: quay.io/heytrav/domain-api:0.1.18
     volumes:
       - ../drs-project:/usr/local/domain-api
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
