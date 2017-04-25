@@ -46,6 +46,11 @@ services:
   centralnic:
     image: quay.io/heytrav/nodepp:1.1.5
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+    healthcheck: 
+      test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+      interval: 1m
+      timeout: 20s
+      retries: 3
     volumes:
       - ../nodepp:/opt/project/node-epp
     depends_on:
@@ -92,6 +97,11 @@ services:
   cocca:
     image: quay.io/heytrav/nodepp:1.1.5
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+    healthcheck: 
+      test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+      interval: 1m
+      timeout: 20s
+      retries: 3
     volumes:
       - ../nodepp:/opt/project/node-epp
     depends_on:
@@ -124,6 +134,7 @@ services:
       - mysql_user
       - mysql_password
       - django_secret_key
+      - domain_api_sentry_dsn
       - jwt_secret_key
       - logzio_token
     deploy:
