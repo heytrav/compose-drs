@@ -1,5 +1,9 @@
 ---
 
+database_host: domaindb
+rabbitmq_host: rabbitmq
+rabbitmq_port: 5672
+rabbitmq_default_vhost: /
 images:
   rabbitmq:
     image: quay.io/heytrav/rabbitmq

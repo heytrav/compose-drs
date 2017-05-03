@@ -1,9 +1,9 @@
 RABBITMQ_DEFAULT_USER={{ rabbitmq_default_user  }}
 RABBITMQ_DEFAULT_PASS={{ rabbitmq_default_pass  }}
-RABBITMQ_HOST=rabbitmq
-RABBITMQ_PORT=5672
-RABBITMQ_DEFAULT_VHOST=/
-MYSQL_HOST=domaindb
+RABBITMQ_HOST={{ rabbitmq_host  }}
+RABBITMQ_PORT={{ rabbitmq_port  }}
+RABBITMQ_DEFAULT_VHOST={{ rabbitmq_default_host  }}
+MYSQL_HOST={{ database_host  }}
 LOGZIO_TOKEN_FILE=/run/secrets/logzio_token
 CENTRALNIC_TEST_LOGIN_FILE=/run/secrets/centralnic_test_login
 CENTRALNIC_TEST_PASSWORD_FILE=/run/secrets/centralnic_test_password
