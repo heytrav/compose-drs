@@ -17,3 +17,5 @@ images:
 rabbitmq_default_user: vault_rabbitmq_default_user
 rabbitmq_default_pass: vault_rabbitmq_default_pass
 rabbitmq_erlang_cookie: vault_rabbitmq_erlang_cookie
+
+sentry_environment: testing
