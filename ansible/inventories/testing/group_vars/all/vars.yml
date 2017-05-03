@@ -1,0 +1,19 @@
+---
+
+images:
+  rabbitmq:
+    tag: latest
+  mariadb:
+    tag: 10.1.21
+  api:
+    tag: 1.1.20
+  nodepp:
+    tag: 1.2.1
+  nginx:
+    tag: 0.1.0
+  memcached:
+    tag: latest
+
+rabbitmq_default_user: vault_rabbitmq_default_user
+rabbitmq_default_pass: vault_rabbitmq_default_pass
+rabbitmq_erlang_cookie: vault_rabbitmq_erlang_cookie

@@ -1,0 +1,15 @@
+---
+
+images:
+  rabbitmq:
+    image: quay.io/heytrav/rabbitmq
+  mariadb:
+    image: mariadb
+  api:
+    image: quay.io/heytrav/domain-api
+  nodepp:
+    image: quay.io/heytrav/nodepp
+  nginx:
+    image: quay.io/heytrav/drs-nginx
+  memcached:
+    image: memcached
