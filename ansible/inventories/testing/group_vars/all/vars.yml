@@ -1,6 +1,18 @@
 ---
 
 base_directory: /home/ubuntu
+
+service_list:
+  - rabbitmq
+  - domaindb
+  - celery
+  - centralnic
+  - nzrs
+  - cocca
+  - migrate
+  - api
+  - nginx
+  - memcached
 images:
   rabbitmq:
     image: quay.io/heytrav/rabbitmq

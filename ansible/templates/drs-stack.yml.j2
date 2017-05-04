@@ -1,222 +1,44 @@
 version: "3.1"
+
 services:
-
-  rabbitmq:
-    image: {{ images.rabbitmq.image  }}:{{ images.rabbitmq.tag  }}
+{% for service_name in service_list %}
+  {% if service_name in services %}
+    {% spec = services[service_name] %}
+  {{ service_name }}:
+    image: {{ spec.image  }}
+    {% if spec.ports is defined %}
     ports:
-      - 15672:15672
-    env_file: .stack_env
-
-  domaindb:
-    image: {{ images.mariadb.image  }}:{{ images.mariadb.tag  }}
-    env_file: .stack_env
-    secrets:
-      - mysql_password
-      - mysql_root_password
-      - mysql_database
-      - mysql_user
-    volumes:
-      - /var/lib/mysql:/var/lib/mysql
-    deploy:
-      placement:
-        constraints:
-          - node.labels.role == database
-
-  celery:
-    image: {{ images.api.image  }}:{{ images.api.tag  }}
-    command: ["celery", "-A", "application", "worker", "-l", "info"]
-    depends_on:
-      - rabbitmq
-    env_file: .stack_env
+    {% for port in spec.ports %}
+      - {{ port  }}
+    {% endfor %}
+    {% endif %}
+    {% if spec.env_file is defined %}
+    env_file: {{ spec.env_file  }}
+    {% endif %}
+    {% if spec.environment is defined %}
     environment:
-      SENTRY_DSN_FILE: /run/secrets/celery_sentry_dsn
-      RELEASE_VERSION: {{ images.api.tag  }}
+    {% for env_var, env_value in spec.environment.items() %}
+      {{ env_var  }}: {{ env_value  }} 
+    {% endfor %}
+    {% endif %}
+    {% if spec.secrets is defined %}
     secrets:
-      - mysql_database
-      - mysql_user
-      - mysql_password
-      - celery_sentry_dsn
-      - django_secret_key
-      - jwt_secret_key
-      - logzio_token
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 10s
+      {% for secret in spec.secrets %}
+       - {{ secret  }} 
+      {% endfor %}
+    {% endif %}
+    {% if spec.volumes is defined %}
+     volumes:
+     {% for volume in spec.volumes %}
+       - {{ volume  }}
+     {% endfor %}
+    {% endif %}
 
-  centralnic:
-    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
-    command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
-    healthcheck: 
-      test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
-      interval: 1m
-      timeout: 20s
-      retries: 3
-    depends_on:
-      - rabbitmq
-    env_file: .stack_env
-    environment:
-      EPP_LOGIN_FILE: /run/secrets/centralnic_test_login
-      EPP_PASSWORD_FILE: /run/secrets/centralnic_test_password
-      RELEASE_VERSION: {{ images.nodepp.tag  }}
-    secrets:
-      - centralnic_test_login
-      - centralnic_test_password
-      - centralnic_test_config
-      - nodepp_sentry_dsn
-      - logzio_token
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-      update_config:
-        parallelism: 1
-        delay: 5s
-        failure_action: pause
+  {% endif %}
+{% endfor %}
+  
 
-  nzrs:
-    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
-    command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
-    healthcheck: 
-      test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
-      interval: 1m
-      timeout: 20s
-      retries: 3
-    depends_on:
-      - rabbitmq
-    env_file: .stack_env
-    environment:
-      EPP_LOGIN_FILE: /run/secrets/nzrs_test_login
-      EPP_PASSWORD_FILE: /run/secrets/nzrs_test_password
-      RELEASE_VERSION: {{ images.nodepp.tag  }}
-    secrets:
-      - nzrs_test_login
-      - nzrs_test_password
-      - nzrs_test_config
-      - nodepp_sentry_dsn
-      - nzrs-epp-test.pem
-      - nzrs-epp-test.key
-      - logzio_token
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-      update_config:
-        parallelism: 1
-        delay: 5s
-        failure_action: pause
-
-
-  cocca:
-    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
-    command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
-    healthcheck: 
-      test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
-      interval: 1m
-      timeout: 20s
-      retries: 3
-    depends_on:
-      - rabbitmq
-    env_file: .stack_env
-    environment:
-      EPP_LOGIN_FILE: /run/secrets/cocca_test_login
-      EPP_PASSWORD_FILE: /run/secrets/cocca_test_password
-      RELEASE_VERSION: {{ images.nodepp.tag  }}
-    secrets:
-      - cocca_test_login
-      - cocca_test_password
-      - cocca_test_config
-      - nodepp_sentry_dsn
-      - logzio_token
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-      update_config:
-        parallelism: 1
-        delay: 5s
-        failure_action: pause
-
-  migrate:
-    image: {{ images.api.image  }}:{{ images.api.tag  }}
-    command: ["python3", "manage.py", "migrate"]
-    depends_on:
-      - domaindb
-    env_file: .stack_env
-    environment:
-      SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
-      RELEASE_VERSION: {{ images.api.tag  }}
-    secrets:
-      - mysql_database
-      - mysql_user
-      - mysql_password
-      - django_secret_key
-      - jwt_secret_key
-      - logzio_token
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 1
-
-  api:
-    image: {{ images.api.image  }}:{{ images.api.tag  }}
-    command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
-    #command: ["gunicorn", "application.wsgi", "-w", "1", "-b", "0.0.0.0:8000"]
-    depends_on:
-      - rabbitmq
-      - domaindb
-    env_file: .stack_env
-    environment:
-      SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
-      RELEASE_VERSION: {{ images.api.tag  }}
-    secrets:
-      - mysql_database
-      - mysql_user
-      - mysql_password
-      - domain_api_sentry_dsn
-      - django_secret_key
-      - jwt_secret_key
-      - logzio_token
-    deploy:
-      replicas: 3
-      update_config:
-        parallelism: 1
-        delay: 5s
-        failure_action: pause
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-
-  nginx:
-    image: {{ images.nginx.image  }}:{{ images.nginx.tag  }}
-    ports:
-      - "443:443"
-    secrets:
-      - site.key
-      - site.crt
-    command: ["nginx"]
-    depends_on:
-      - api
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-
-  memcached:
-    image: {{ images.memcached.image  }}:{{ images.memcached.tag  }}
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-      resources:
-        limits:
-          memory: 64M
-        reservations:
-          memory: 64M
-
+      
 
 secrets:
   cocca_test_login:
