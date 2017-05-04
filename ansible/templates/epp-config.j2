@@ -1,0 +1,38 @@
+{
+    "app-config": {
+        "{{ registry.name  }}": {
+            "ssl": {{ registry.ssl  }},
+{% if registry.cert is defined %}
+            "cert":  {{ registry.cert  }},
+            "key":  {{ registry.key  }},
+{% endif %}
+            "port": {{ registry.port  }},
+            "host": "{{ registry.host  }}",
+            "services": [ {% for item in registry.services %} "{{ item  }}"{% if not loop.last %},{% endif %} {% endfor %} ],
+        {% if registry.extensions is defined %}
+            "extensions": [
+            {% for item in registry.extensions %}
+                "{{ item  }}"{% if not last.loop %},{% endif %}
+            {% endfor %}
+            ],
+        {% endif %}
+        {% if registry.extensionClasses is defined %}
+            "extensionClasses": [
+            {% for item in registry.extensionClasses %}
+                {
+                    "extension": "{{ item.extension  }}",
+                    "className": "{{ item.className  }}"
+                }{% if not loop.last %},{% endif %}
+            {% endfor %}
+            ],
+        {% endif %}
+            "namespaces":{
+                {% for k, v in registry.namespaces.items() %}
+                    "{{ k  }}": {
+                        "xmlns": "{{ v }}"
+                    }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            }
+        }
+    }
+}
