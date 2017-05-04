@@ -1,6 +1,6 @@
 ---
 
-base_directory: /home/ubuntu
+base_directory: ~/workspace/innovation/compose-drs
 images:
   rabbitmq:
     image: quay.io/heytrav/rabbitmq

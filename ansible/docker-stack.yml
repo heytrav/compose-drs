@@ -3,11 +3,17 @@
   hosts: manager
   tasks:
     - name: Create docker compose spec
+      notify: deploy stack
       template:
         src: templates/drs-stack.yml.j2
-        dest: /home/ubuntu/drs-stack.yml
+        dest: "{{ base_directory  }}/drs-stack.yml"
         
     - name: Create support environment file
       template: 
         src: templates/stack_env.j2
-        dest: /home/ubuntu/.stack_env
+        dest: "{{ base_directory  }}/.stack_env"
+
+
+  handlers:
+    - name: deploy stack
+      shell: bash -lc "cd  {{ base_directory  }} && docker stack deploy -c drs-stack.yml domainapi"

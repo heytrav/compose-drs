@@ -1,2 +1,4 @@
 .env
 *.retry
+.stack_env
+drs-stack.yml
