@@ -5,9 +5,9 @@
     - name: Create docker compose spec
       template:
         src: templates/drs-stack.yml.j2
-        dest: /home/manager1/drs-stack.yml
+        dest: /home/ubuntu/drs-stack.yml
         
     - name: Create support environment file
       template: 
         src: templates/stack_env.j2
-        dest: /home/manager1/.stack_env
+        dest: /home/ubuntu/.stack_env

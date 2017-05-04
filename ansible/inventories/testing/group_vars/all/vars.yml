@@ -2,16 +2,22 @@
 
 images:
   rabbitmq:
+    image: quay.io/heytrav/rabbitmq
     tag: latest
   mariadb:
+    image: mariadb
     tag: 10.1.21
   api:
+    image: quay.io/heytrav/domain-api
     tag: 1.1.20
   nodepp:
+    image: quay.io/heytrav/nodepp
     tag: 1.2.2
   nginx:
+    image: quay.io/heytrav/drs-nginx
     tag: 0.1.0
   memcached:
+    image: memcached
     tag: latest
 
 registries:

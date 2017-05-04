@@ -5,11 +5,11 @@ services:
     image: {{ images.rabbitmq.image  }}:{{ images.rabbitmq.tag  }}
     ports:
       - 15672:15672
-    env_file: .env
+    env_file: .stack_env
 
   domaindb:
     image: {{ images.mariadb.image  }}:{{ images.mariadb.tag  }}
-    env_file: .env
+    env_file: .stack_env
     secrets:
       - mysql_password
       - mysql_root_password
@@ -27,7 +27,7 @@ services:
     command: ["celery", "-A", "application", "worker", "-l", "info"]
     depends_on:
       - rabbitmq
-    env_file: .env
+    env_file: .stack_env
     environment:
       SENTRY_DSN_FILE: /run/secrets/celery_sentry_dsn
       RELEASE_VERSION: {{ images.api.tag  }}
@@ -54,7 +54,7 @@ services:
       retries: 3
     depends_on:
       - rabbitmq
-    env_file: .env
+    env_file: .stack_env
     environment:
       EPP_LOGIN_FILE: /run/secrets/centralnic_test_login
       EPP_PASSWORD_FILE: /run/secrets/centralnic_test_password
@@ -85,7 +85,7 @@ services:
       retries: 3
     depends_on:
       - rabbitmq
-    env_file: .env
+    env_file: .stack_env
     environment:
       EPP_LOGIN_FILE: /run/secrets/nzrs_test_login
       EPP_PASSWORD_FILE: /run/secrets/nzrs_test_password
@@ -119,7 +119,7 @@ services:
       retries: 3
     depends_on:
       - rabbitmq
-    env_file: .env
+    env_file: .stack_env
     environment:
       EPP_LOGIN_FILE: /run/secrets/cocca_test_login
       EPP_PASSWORD_FILE: /run/secrets/cocca_test_password
@@ -145,7 +145,7 @@ services:
     command: ["python3", "manage.py", "migrate"]
     depends_on:
       - domaindb
-    env_file: .env
+    env_file: .stack_env
     environment:
       SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
       RELEASE_VERSION: {{ images.api.tag  }}
@@ -168,7 +168,7 @@ services:
     depends_on:
       - rabbitmq
       - domaindb
-    env_file: .env
+    env_file: .stack_env
     environment:
       SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
       RELEASE_VERSION: {{ images.api.tag  }}
