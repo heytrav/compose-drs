@@ -4,3 +4,7 @@ database_host: domaindb
 rabbitmq_host: rabbitmq
 rabbitmq_port: 5672
 rabbitmq_default_vhost: /
+
+nodepp_sentry_webhook_url: vault_nodepp_sentry_webhook_url
+api_sentry_webhook_url: vault_api_sentry_webhook_url
+celery_sentry_webhook_url: vault_celery_sentry_webhook_url

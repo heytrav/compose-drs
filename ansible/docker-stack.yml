@@ -3,12 +3,18 @@
   hosts: manager
   tasks:
     - name: Create docker compose spec
-      notify: deploy stack
+      notify:
+        - deploy stack
+        - nodepp version
+        - api version
+        - celery version
+
       template:
         src: templates/drs-stack.yml.j2
         dest: "{{ base_directory  }}/drs-stack.yml"
         
     - name: Create support environment file
+      notify: deploy stack
       template: 
         src: templates/stack_env.j2
         dest: "{{ base_directory  }}/.stack_env"
@@ -17,3 +23,49 @@
   handlers:
     - name: deploy stack
       shell: bash -lc "cd  {{ base_directory  }} && docker stack deploy -c drs-stack.yml domainapi"
+    - name: nodepp version
+      when: nodepp_sentry_webhook_url is defined
+      become: no
+      run_once: yes
+      local_action:
+        module: uri
+        url: "{{  nodepp_sentry_webhook_url }}"
+        method: POST
+        body_format: json
+        status_code: 201, 208
+        body: >
+          {
+            "version": "{{ images.nodepp.tag }}"
+          }
+
+
+    - name: api version
+      when: api_sentry_webhook_url is defined
+      become: no
+      run_once: yes
+      local_action:
+        module: uri
+        url: "{{  api_sentry_webhook_url }}"
+        method: POST
+        body_format: json
+        status_code: 201, 208
+        body: >
+          {
+            "version": "{{ images.api.tag }}"
+          }
+
+
+    - name: celery version
+      when: celery_sentry_webhook_url is defined
+      become: no
+      run_once: yes
+      local_action:
+        module: uri
+        url: "{{  celery_sentry_webhook_url }}"
+        method: POST
+        body_format: json
+        status_code: 201, 208
+        body: >
+          {
+            "version": "{{ images.api.tag }}"
+          }
