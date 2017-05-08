@@ -31,6 +31,8 @@ service_list:
   domaindb:
     image: "{{ images.mariadb.image  }}:{{ images.mariadb.tag  }}"
     env_file: .stack_env
+    ports:
+      - 3306:3306
     secrets:
       - mysql_password
       - mysql_root_password
@@ -61,6 +63,7 @@ service_list:
       restart_policy:
         condition: on-failure
         delay: 10s
+
   centralnic:
     image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
@@ -93,6 +96,7 @@ service_list:
         parallelism: 1
         delay: 5s
         failure_action: pause
+
   cocca:
     image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
@@ -125,6 +129,7 @@ service_list:
         parallelism: 1
         delay: 5s
         failure_action: pause
+
   migrate:
     image: "{{ images.api.image  }}:{{ images.api.tag  }}"
     command: ["python3", "manage.py", "migrate"]
@@ -147,6 +152,7 @@ service_list:
       restart_policy:
         condition: on-failure
         max_attempts: 1
+
   api:
     image: "{{ images.api.image  }}:{{ images.api.tag  }}"
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
@@ -177,6 +183,7 @@ service_list:
       restart_policy:
         condition: on-failure
         delay: 10s
+
   nginx:
     image: "{{ images.nginx.image  }}:{{ images.nginx.tag  }}"
     ports:
