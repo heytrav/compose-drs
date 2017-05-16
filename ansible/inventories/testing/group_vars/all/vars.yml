@@ -11,10 +11,10 @@ images:
     tag: 10.1.21
   api:
     image: quay.io/heytrav/domain-api
-    tag: 1.1.20
+    tag: 1.1.21
   nodepp:
     image: quay.io/heytrav/nodepp
-    tag: 1.2.2
+    tag: 1.2.3
   nginx:
     image: quay.io/heytrav/drs-nginx
     tag: 0.1.0
