@@ -60,9 +60,14 @@ service_list:
       - jwt_secret_key
       - logzio_token
     deploy:
+      replicas: 2
       restart_policy:
         condition: on-failure
         delay: 10s
+      update_config:
+        parallelism: 1
+        delay: 5s
+        failure_action: pause
   centralnic:
     image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
