@@ -176,6 +176,7 @@ service_list:
       - django_secret_key
       - jwt_secret_key
       - logzio_token
+      - domain_api_sentry_dsn
     deploy:
       restart_policy:
         condition: on-failure
