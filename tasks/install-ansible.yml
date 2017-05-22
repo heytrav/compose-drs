@@ -1,3 +1,7 @@
+#
+# Will install ansible (with openstack support) in to system python
+#
+
 - name: Install python packages
   apt: name="{{ item }}"
   with_items: [python-dev, python-setuptools, python-pip, gcc, git, libssl-dev, libffi-dev]
