@@ -1,0 +1,4 @@
+- raw: >
+    which python || sudo {{ ' yum' if common_osfamily == 'redhat' else 'apt-get'  }} install -y python && echo 'installed'
+  register: python
+  changed_when: python.stdout == 'installed'
