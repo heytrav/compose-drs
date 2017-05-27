@@ -11,7 +11,7 @@ images:
     tag: 10.1.21
   api:
     image: quay.io/heytrav/domain-api
-    tag: 1.2.5
+    tag: 1.2.6
   nodepp:
     image: quay.io/heytrav/nodepp
     tag: 1.2.3
