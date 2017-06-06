@@ -13,7 +13,7 @@ images:
     tag: 1.2.5
   nodepp:
     image: quay.io/heytrav/nodepp
-    tag: 1.2.3
+    tag: 1.2.4
   nginx:
     image: quay.io/heytrav/drs-nginx
     tag: 0.1.0
