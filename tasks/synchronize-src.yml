@@ -3,7 +3,7 @@
 # Synchronize local source code repository from localhost to target host
 #
 - name: Generate file list
-  shell: git ls-files > .git-ls-files
+  shell: git ls-files > /tmp/.git-ls-files
   become: false
   changed_when: false
   args:
@@ -11,7 +11,7 @@
   delegate_to: 'localhost'
 
 - name: Generate file list (submodules)
-  shell: "git submodule --quiet foreach 'git ls-files | sed \"s|^|$path/|\"' >> .git-ls-files"
+  shell: "git submodule --quiet foreach 'git ls-files | sed \"s|^|$path/|\"' >> /tmp/.git-ls-files"
   become: false
   changed_when: false
   args:
@@ -23,7 +23,7 @@
   become_user: "{{ src_owner | default(omit)}}"
   become: "{{ src_owner is defined }}"
   vars:
-    rsync_opts: "--files-from=../.git-ls-files"
+    rsync_opts: "--files-from=/tmp/.git-ls-files"
 
 # this is crappy, but a touch more reliable that git clone from our internal
 # gitlab with its odd cert
