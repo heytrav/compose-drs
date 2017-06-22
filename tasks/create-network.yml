@@ -1,0 +1,23 @@
+---
+- name: Create Network
+  os_network:
+    name: "{{ cc_network_name }}"
+    state: present
+
+- name: Create subnet
+  os_subnet:
+    name: "{{ cc_subnet_name }}"
+    network_name: "{{ cc_network_name }}"
+    state: present
+    cidr: "{{ cc_subnet_cidr }}"
+    allocation_pool_start: "{{ cc_subnet_dhcp_start }}"
+    allocation_pool_end: "{{ cc_subnet_dhcp_end }}"
+    ip_version: 4
+
+- name: Create router
+  os_router:
+    state: present
+    name: "{{ cc_router_name }}"
+    network: "{{ cc_public_net_name }}"
+    interfaces:
+      - "{{ cc_network_name }}"

@@ -1,0 +1,5 @@
+---
+- name: Create keypair
+  os_keypair:
+    name: "{{ cc_default_keypair_name }}"
+    public_key: "{{ cc_default_keypair_pubkey }}"

@@ -1,0 +1,18 @@
+[{{ cc_environment }}]
+{% for server in cc_servers %}
+{{ server.name }} ansible_host={{ server.ip }} ansible_nodename={{ server.name }}
+{% endfor %}
+
+[{{ cc_environment }}:vars]
+ansible_ssh_extra_args=-o StrictHostKeyChecking=no
+ansible_ssh_user={{ cc_ssh_user }}
+
+{% for group in cc_servers | json_query('[].groups | []') | unique %}
+[{{ group }}]
+{% for server in cc_servers %}
+{% if group in server.groups | default([]) -%}
+{{ server.name }}
+{% endif %}
+{% endfor %}
+
+{% endfor %}

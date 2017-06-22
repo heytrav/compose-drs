@@ -1,0 +1,54 @@
+#
+# TODO - remove copy pasta, highlight required vars, maybe stick them in
+# defaults/main.yml
+#
+- name: Create security groups
+  os_security_group:
+    state: present
+    name: "{{ item }}"
+  with_items: "{{ server_security_group_names }}"
+
+- name: Add rules for security group
+  os_security_group_rule:
+    state: present
+    security_group: "{{ item.group }}"
+    protocol: tcp
+    port_range_min: "{{ item.port }}"
+    port_range_max: "{{ item.port_end | default(item.port) }}"
+    remote_ip_prefix: "{{ item.remote_ip_prefix | default(omit) }}"
+    remote_group: "{{ item.remote_group | default(omit) }}"
+  with_items: "{{ server_security_groups }}"
+
+- name: Create network port
+  os_port:
+    state: present
+    admin_state_up: yes
+    name: "{{ gitlab_runner_name }}"
+    security_groups: "{{ security_group_names }}"
+    network: "{{ gitlab_network_name }}"
+    fixed_ips:
+     - {ip_address: "{{ gitlab_fixed_ip }}"}
+
+- name: Create volume
+  os_volume:
+    display_name: "{{ gitlab_volume_name }}"
+    size: "{{ gitlab_volume_size_mb // 1024 }}"
+
+- name: Create server
+  os_server:
+    state: present
+    name: "{{ gitlab_runner_name }}"
+    image: "{{ gitlab_os_image }}"
+    key_name: "{{ keypair_name }}"
+    flavor: "{{ gitlab_flavor }}"
+    nics: ["port-name={{ gitlab_runner_name }}"]
+    auto_ip: false
+    userdata: |
+      #cloud-config
+      user: {{ gitlab_ssh_user }}
+
+- name: Attach volume to server
+  os_server_volume:
+    volume: "{{ gitlab_volume_name }}"
+    server: "{{ gitlab_runner_name }}"
+    device: "{{ gitlab_volume_device }}"
