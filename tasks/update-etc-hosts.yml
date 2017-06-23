@@ -1,0 +1,12 @@
+---
+
+# installs the host entries of {{ target_group }} to
+# the hosts in the play. eg. to make sure all databases
+# know about all hosts in the app group
+
+- name: Populate etc hosts from servers blob
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ item.ip }} {{ item.name }}"
+    regexp: " {{ item.name }}$"
+  with_items: "{{ cc_servers }}"
