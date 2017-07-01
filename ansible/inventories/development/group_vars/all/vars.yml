@@ -10,7 +10,7 @@ images:
     tag: latest
   api:
     image: quay.io/heytrav/domain-api
-    tag: 1.2.17
+    tag: 1.2.18
   nodepp:
     image: quay.io/heytrav/nodepp
     tag: 1.2.5
