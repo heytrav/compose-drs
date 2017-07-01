@@ -7,14 +7,14 @@ images:
     image: quay.io/heytrav/rabbitmq
     tag: latest
   mariadb:
-    image: mariadb
-    tag: 10.1.21
+    image: mysql
+    tag: latest
   api:
     image: quay.io/heytrav/domain-api
-    tag: 1.2.6
+    tag: 1.2.16
   nodepp:
     image: quay.io/heytrav/nodepp
-    tag: 1.2.4
+    tag: 1.2.5
   nginx:
     image: quay.io/heytrav/drs-nginx
     tag: 0.1.0
