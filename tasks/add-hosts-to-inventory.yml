@@ -1,3 +1,18 @@
+- name: Add hosts on VPNised network to inventory
+  add_host:
+    name: "{{ item.name }}"
+    ansible_nodename: "{{ item.name }}"
+    ansible_ssh_host: "{{ item.ip }}"
+    ansible_ssh_user: "{{ cc_ssh_user }}"
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no "
+    groups: "{{ item.groups | default([]) }}"
+    common_osfamily: "{{ item.osfamily | default('debian') }}"
+  with_items: "{{ cc_servers }}"
+  when: 'cc_access_via_vpn'
+  vars:
+    groups_query: "[?name=='{{ item.name }}'].groups | []"
+  changed_when: false
+
 - name: Add hosts with floating ips to inventory
   add_host:
     name: "{{ item.name }}"

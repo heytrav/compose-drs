@@ -94,6 +94,9 @@ cc_servers: []
 # hash containing a mapping between servername -> pre-allocated floating ip
 # (get one with `openstack floating ip create public-net`)
 cc_floating_ips: {}
+# if true, assume hosts can be reached on their primary fixed ip
+cc_access_via_vpn: false
+
 
 # if specified, access to hosts without a floating ip is set up via this jump host
 # cc_jump_host:
