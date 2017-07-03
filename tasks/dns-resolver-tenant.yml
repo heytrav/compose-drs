@@ -1,0 +1,70 @@
+#  Sets up dnsmasq to serve dns for all entries in the openstack tenant
+- name: Install dnsmasq
+  apt: name=dnsmasq
+
+- file: path=/etc/dnsmasq-hosts state=directory
+
+- name: Purge upstream resolvers
+  lineinfile:
+    path: /etc/dnsmasq.conf
+    regexp: '^server='
+    state: absent
+
+- name: Add upstream resolvers
+  lineinfile:
+    path: /etc/dnsmasq.conf
+    line: "server=/{{ item.domain }}/{{ item.resolver }}"
+  with_items: "{{ cc_local_resolver_upstreams }}"
+  tags: debug
+
+- name: DNS API user/pass
+  copy:
+    dest: "/etc/catalystcloud-powerdns.creds"
+    owner: root
+    group: openstack
+    mode: 0640
+    content: "{{ vault_cc_powerdns_credentials }}"
+  when: "vault_cc_powerdns_credentials is defined"
+
+# Todo install catalystcloud-powerdns somehow
+
+- name: DNS Update script
+  copy:
+    dest: /usr/local/bin/update-dns.sh
+    mode: 0755
+    owner: root
+    group: root
+    content: |
+      #! /bin/sh
+      #
+      # Script for updating tenant and corporate dns with entries from local tenant
+      #
+      . /etc/openstack.sh
+      set -e
+      # to etc hosts files
+      /opt/catalystcloud-powerdns/populate-zone \
+        --dns-zone devcloud.cat-it.co.nz. \
+        --openstack-network pact-dev-internal \
+        --local-hosts > /etc/dnsmasq-hosts/openstack-hosts
+      {% if vault_cc_powerdns_credentials is defined %}
+      # Corporate DNS update
+      /opt/catalystcloud-powerdns/populate-zone \
+        --dns-zone devcloud.cat-it.co.nz. \
+        --openstack-network pact-dev-internal \
+        --dns-api-creds /etc/catalystcloud-powerdns.creds
+      {% endif %}
+
+
+- name: Get cron to update dns every hour
+  copy:
+    dest: /etc/cron.hourly/update-dns
+    content: /usr/local/bin/update-dns.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Perform DNS update
+  shell: /usr/local/bin/update-dns.sh
+
+- name: Restart dnsmasq
+  service: name=dnsmasq state=restarted

@@ -19,6 +19,17 @@ cc_ssh_user: ubuntu
 # resources where a tenant might be shared
 cc_prefix:
 
+cc_auth_url: https://api.cloud.catalyst.net.nz:5000/v2.0
+
+cc_default_domain: "openstacklocal"
+cc_default_nameservers: [202.78.247.197, 202.78.247.198, 202.78.247.199]
+
+# when using the dns-resolver-tenant task, you can add upstream resolvers for
+# various bits of private dns
+cc_local_resolver_upstreams:
+# for example
+#  - {domain: 'wgtn.cat-it.co.nz', resolver: '192.168.8.140'}
+
 cc_default_keypair_name: "{{ ansible_env['USER']  }}-at-{{ ansible_nodename }}"
 cc_default_keypair_file: "{{ ansible_env['HOME'] }}/.ssh/id_rsa.pub"
 cc_default_keypair_pubkey: "{{ lookup('file', cc_default_keypair_file) }}"

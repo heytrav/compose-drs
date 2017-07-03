@@ -39,6 +39,13 @@
                  {% for key in item.authorized_keys | default(cc_default_server_authorized_keys) %}
                    - "{{ key }}"
                  {% endfor %}
+               fqdn: "{{ item.name }}.{{ item.domain | default(cc_default_domain) }}"
+               manage_resolv_conf: true
+               resolv_conf:
+                 nameservers: "{{ item.nameservers | default(cc_default_nameservers) }}"
+                 searchdomains:
+                   - "{{ cc_default_domain }}"
+                 domain: "{{ cc_default_domain }}"
 
 - name: Attach volume to server
   os_server_volume:
