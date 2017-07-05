@@ -1,7 +1,6 @@
 ---
 
-base_directory: /home/ubuntu
-
+base_directory: ~/workspace/innovation/compose-drs
 images:
   rabbitmq:
     image: quay.io/heytrav/rabbitmq
@@ -28,23 +27,24 @@ service_list:
     ports:
       - 15672:15672
     env_file: .stack_env
+
   domaindb:
     image: "{{ images.mariadb.image  }}:{{ images.mariadb.tag  }}"
     env_file: .stack_env
+    ports:
+      - 3306:3306
     secrets:
       - mysql_password
       - mysql_root_password
       - mysql_database
       - mysql_user
     volumes:
-      - /var/lib/mysql:/var/lib/mysql
-    deploy:
-      placement:
-        constraints:
-          - node.labels.role == database
+      - ../database/mysql:/var/lib/mysql
   celery:
     image: "{{ images.api.image  }}:{{ images.api.tag  }}"
     command: ["celery", "-A", "application", "worker", "-l", "info"]
+    volumes:
+      - ../drs-project:/usr/local/domain-api
     depends_on:
       - rabbitmq
     env_file: .stack_env
@@ -60,17 +60,15 @@ service_list:
       - jwt_secret_key
       - logzio_token
     deploy:
-      replicas: 2
       restart_policy:
         condition: on-failure
         delay: 10s
-      update_config:
-        parallelism: 1
-        delay: 5s
-        failure_action: pause
+
   centralnic:
     image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+    volumes:
+      - ../nodepp:/opt/project/node-epp
     healthcheck: 
       test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
       interval: 1m
@@ -90,7 +88,7 @@ service_list:
       - nodepp_sentry_dsn
       - logzio_token
     deploy:
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 10s
@@ -98,41 +96,12 @@ service_list:
         parallelism: 1
         delay: 5s
         failure_action: pause
-  nzrs:
-    image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
-    command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
-    healthcheck: 
-      test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
-      interval: 1m
-      timeout: 20s
-      retries: 3
-    depends_on:
-      - rabbitmq
-    env_file: .stack_env
-    environment:
-      EPP_LOGIN_FILE: /run/secrets/nzrs_test_login
-      EPP_PASSWORD_FILE: /run/secrets/nzrs_test_password
-      RELEASE_VERSION: "{{ images.nodepp.tag  }}"
-    secrets:
-      - nzrs_test_login
-      - nzrs_test_password
-      - nzrs_test_config
-      - nodepp_sentry_dsn
-      - nzrs-epp-test.pem
-      - nzrs-epp-test.key
-      - logzio_token
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-      update_config:
-        parallelism: 1
-        delay: 5s
-        failure_action: pause
+
   cocca:
     image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+    volumes:
+      - ../nodepp:/opt/project/node-epp
     healthcheck: 
       test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
       interval: 1m
@@ -152,7 +121,7 @@ service_list:
       - nodepp_sentry_dsn
       - logzio_token
     deploy:
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
         delay: 10s
@@ -160,9 +129,12 @@ service_list:
         parallelism: 1
         delay: 5s
         failure_action: pause
+
   migrate:
     image: "{{ images.api.image  }}:{{ images.api.tag  }}"
     command: ["python3", "manage.py", "migrate"]
+    volumes:
+      - ../drs-project:/usr/local/domain-api
     depends_on:
       - domaindb
     env_file: .stack_env
@@ -181,10 +153,13 @@ service_list:
       restart_policy:
         condition: on-failure
         max_attempts: 1
+
   api:
     image: "{{ images.api.image  }}:{{ images.api.tag  }}"
     command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
     #command: ["gunicorn", "application.wsgi", "-w", "1", "-b", "0.0.0.0:8000"]
+    volumes:
+      - ../drs-project:/usr/local/domain-api
     depends_on:
       - rabbitmq
       - domaindb
@@ -201,7 +176,7 @@ service_list:
       - jwt_secret_key
       - logzio_token
     deploy:
-      replicas: 3
+      replicas: 1
       update_config:
         parallelism: 1
         delay: 5s
@@ -209,6 +184,7 @@ service_list:
       restart_policy:
         condition: on-failure
         delay: 10s
+
   nginx:
     image: "{{ images.nginx.image  }}:{{ images.nginx.tag  }}"
     ports:
@@ -239,4 +215,4 @@ rabbitmq_default_user: vault_rabbitmq_default_user
 rabbitmq_default_pass: vault_rabbitmq_default_pass
 rabbitmq_erlang_cookie: vault_rabbitmq_erlang_cookie
 
-sentry_environment: testing
+sentry_environment: development
