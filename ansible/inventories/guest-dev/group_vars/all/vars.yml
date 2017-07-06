@@ -49,53 +49,17 @@ service_list:
       - rabbitmq
     env_file: .stack_env
     environment:
-      SENTRY_DSN_FILE: /run/secrets/celery_sentry_dsn
       RELEASE_VERSION: "{{ images.api.tag  }}"
     secrets:
       - mysql_database
       - mysql_user
       - mysql_password
-      - celery_sentry_dsn
       - django_secret_key
       - jwt_secret_key
-      - logzio_token
     deploy:
       restart_policy:
         condition: on-failure
         delay: 10s
-
-  centralnic:
-    image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
-    command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
-    volumes:
-      - ../nodepp:/opt/project/node-epp
-    healthcheck: 
-      test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
-      interval: 1m
-      timeout: 20s
-      retries: 3
-    depends_on:
-      - rabbitmq
-    env_file: .stack_env
-    environment:
-      EPP_LOGIN_FILE: /run/secrets/centralnic_test_login
-      EPP_PASSWORD_FILE: /run/secrets/centralnic_test_password
-      RELEASE_VERSION: "{{ images.nodepp.tag  }}"
-    secrets:
-      - centralnic_test_login
-      - centralnic_test_password
-      - centralnic_test_config
-      - nodepp_sentry_dsn
-      - logzio_token
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-      update_config:
-        parallelism: 1
-        delay: 5s
-        failure_action: pause
 
   cocca:
     image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
@@ -118,8 +82,6 @@ service_list:
       - cocca_test_login
       - cocca_test_password
       - cocca_test_config
-      - nodepp_sentry_dsn
-      - logzio_token
     deploy:
       replicas: 1
       restart_policy:
@@ -139,7 +101,6 @@ service_list:
       - domaindb
     env_file: .stack_env
     environment:
-      SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
       RELEASE_VERSION: "{{ images.api.tag  }}"
     secrets:
       - mysql_database
@@ -147,8 +108,6 @@ service_list:
       - mysql_password
       - django_secret_key
       - jwt_secret_key
-      - logzio_token
-      - domain_api_sentry_dsn
     deploy:
       restart_policy:
         condition: on-failure
@@ -165,16 +124,13 @@ service_list:
       - domaindb
     env_file: .stack_env
     environment:
-      SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
       RELEASE_VERSION: "{{ images.api.tag  }}"
     secrets:
       - mysql_database
       - mysql_user
       - mysql_password
-      - domain_api_sentry_dsn
       - django_secret_key
       - jwt_secret_key
-      - logzio_token
     deploy:
       replicas: 1
       update_config:
@@ -210,9 +166,7 @@ service_list:
         reservations:
           memory: 64M
 
-
 rabbitmq_default_user: vault_rabbitmq_default_user
 rabbitmq_default_pass: vault_rabbitmq_default_pass
 rabbitmq_erlang_cookie: vault_rabbitmq_erlang_cookie
 
-sentry_environment: development

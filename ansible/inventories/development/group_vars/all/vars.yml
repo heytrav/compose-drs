@@ -210,28 +210,6 @@ service_list:
         reservations:
           memory: 64M
 
-
-registries:
-  centralnic-test:
-    ssl: true
-    port: 700
-    host: epp-ote.centralnic.com
-    services:
-      - domain
-      - contact
-      - host
-    extensions:
-      - DNSSEC
-    extensionClasses:
-      - extension: DNSSEC
-        className: SecDnsExtension
-    namespaces:
-      - epp: urn:ietf:params:xml:ns:epp-1.0
-        domain: urn:ietf:params:xml:ns:domain-1.0
-        contact: urn:ietf:params:xml:ns:contact-1.0
-        host: urn:ietf:params:xml:ns:host-1.0
-        DNSSEC: urn:ietf:params:xml:ns:secDNS-1.1
-
 rabbitmq_default_user: vault_rabbitmq_default_user
 rabbitmq_default_pass: vault_rabbitmq_default_pass
 rabbitmq_erlang_cookie: vault_rabbitmq_erlang_cookie
