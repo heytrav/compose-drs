@@ -23,14 +23,23 @@ images:
 
 service_list:
   rabbitmq:
+    environment:
+      RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+      RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_default_user  }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_default_pass  }}"
+      RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+      RABBITMQ_ERLANG_COOKIE: "{{ rabbitmq_erlang_cookie  }}"
     image: "{{ images.rabbitmq.image  }}:{{ images.rabbitmq.tag  }}"
     ports:
       - 15672:15672
-    env_file: .stack_env
 
   domaindb:
     image: "{{ images.mariadb.image  }}:{{ images.mariadb.tag  }}"
-    env_file: .stack_env
+    environment:
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
     ports:
       - 3306:3306
     secrets:
@@ -47,10 +56,22 @@ service_list:
       - ../drs-project:/usr/local/domain-api
     depends_on:
       - rabbitmq
-    env_file: .stack_env
     environment:
-      SENTRY_DSN_FILE: /run/secrets/celery_sentry_dsn
       RELEASE_VERSION: "{{ images.api.tag  }}"
+      RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+      RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_default_user  }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_default_pass  }}"
+      RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+      RABBITMQ_ERLANG_COOKIE: "{{ rabbitmq_erlang_cookie  }}"
+      SENTRY_ENVIRONMENT: "{{ sentry_environment }}"
+      SENTRY_DSN_FILE: /run/secrets/celery_sentry_dsn
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+      LOGZIO_TOKEN_FILE: /run/secrets/logzio_token
     secrets:
       - mysql_database
       - mysql_user
@@ -65,6 +86,32 @@ service_list:
         delay: 10s
 
   centralnic:
+    # nodepp config options
+    name: centralnic-test
+    config:
+      host: epp-ote.centralnic.com
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+        - host
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        host:
+          xmlns: urn:ietf:params:xml:ns:host-1.0 
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
     image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
     volumes:
@@ -76,11 +123,16 @@ service_list:
       retries: 3
     depends_on:
       - rabbitmq
-    env_file: .stack_env
     environment:
       EPP_LOGIN_FILE: /run/secrets/centralnic_test_login
       EPP_PASSWORD_FILE: /run/secrets/centralnic_test_password
       RELEASE_VERSION: "{{ images.nodepp.tag  }}"
+      RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+      RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_default_user  }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_default_pass  }}"
+      RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+      RABBITMQ_ERLANG_COOKIE: "{{ rabbitmq_erlang_cookie  }}"
     secrets:
       - centralnic_test_login
       - centralnic_test_password
@@ -98,6 +150,32 @@ service_list:
         failure_action: pause
 
   cocca:
+    # nodepp config options
+    name: cocca-test
+    config:
+      host: ote.coccaregistry.org
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+        - host
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        host:
+          xmlns: urn:ietf:params:xml:ns:host-1.0 
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
     image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
     command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
     volumes:
@@ -109,11 +187,16 @@ service_list:
       retries: 3
     depends_on:
       - rabbitmq
-    env_file: .stack_env
     environment:
       EPP_LOGIN_FILE: /run/secrets/cocca_test_login
       EPP_PASSWORD_FILE: /run/secrets/cocca_test_password
       RELEASE_VERSION: "{{ images.nodepp.tag  }}"
+      RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+      RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_default_user  }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_default_pass  }}"
+      RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+      RABBITMQ_ERLANG_COOKIE: "{{ rabbitmq_erlang_cookie  }}"
     secrets:
       - cocca_test_login
       - cocca_test_password
@@ -137,10 +220,22 @@ service_list:
       - ../drs-project:/usr/local/domain-api
     depends_on:
       - domaindb
-    env_file: .stack_env
     environment:
       SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
       RELEASE_VERSION: "{{ images.api.tag  }}"
+      RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+      RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_default_user  }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_default_pass  }}"
+      RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+      RABBITMQ_ERLANG_COOKIE: "{{ rabbitmq_erlang_cookie  }}"
+      SENTRY_ENVIRONMENT: "{{ sentry_environment }}"
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+      LOGZIO_TOKEN_FILE: /run/secrets/logzio_token
     secrets:
       - mysql_database
       - mysql_user
@@ -163,10 +258,22 @@ service_list:
     depends_on:
       - rabbitmq
       - domaindb
-    env_file: .stack_env
     environment:
       SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
       RELEASE_VERSION: "{{ images.api.tag  }}"
+      RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+      RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_default_user  }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_default_pass  }}"
+      RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+      RABBITMQ_ERLANG_COOKIE: "{{ rabbitmq_erlang_cookie  }}"
+      SENTRY_ENVIRONMENT: "{{ sentry_environment }}"
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+      LOGZIO_TOKEN_FILE: /run/secrets/logzio_token
     secrets:
       - mysql_database
       - mysql_user
@@ -210,8 +317,31 @@ service_list:
         reservations:
           memory: 64M
 
+sentry_environment: development
+
+# nodepp config
+cocca_config:
+  host: ote.coccaregistry.org
+  entities:
+    - domain
+    - contact
+    - host
+
+celery_sentry_dsn: vault_celery_sentry_dsn
+domain_api_sentry_dsn: vault_domain_api_sentry_dsn
+nodepp_sentry_dsn: vault_nodepp_sentry_dsn
+django_secret_key: vault_django_secret_key
+jwt_secret_key: vault_jwt_secret_key
+logzio_token: vault_logzio_token
 rabbitmq_default_user: vault_rabbitmq_default_user
 rabbitmq_default_pass: vault_rabbitmq_default_pass
 rabbitmq_erlang_cookie: vault_rabbitmq_erlang_cookie
-
-sentry_environment: development
+cocca_login: vault_cocca_login
+cocca_password: vault_cocca_password
+centralnic_login: vault_centralnic_login
+centralnic_password: vault_centralnic_password
+mysql_user: vault_mysql_user
+mysql_password: vault_mysql_password
+mysql_database: vault_mysql_database
+site_crt: vault_site_crt
+site_key: vault_site_key
