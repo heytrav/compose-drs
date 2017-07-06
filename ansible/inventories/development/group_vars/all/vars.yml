@@ -3,6 +3,16 @@
 base_directory: ~/workspace/innovation/compose-drs
 
 
+
+centralnic: true
+cocca: true
+nzrs: false
+
+cocca_volumes:
+  - ../nodepp:/opt/project/node-epp
+centralnic_volumes:
+  - ../nodepp:/opt/project/node-epp
+
 sentry_environment: development
 
 
@@ -24,9 +34,4 @@ mysql_password: vault_mysql_password
 mysql_database: vault_mysql_database
 site_crt: vault_site_crt
 site_key: vault_site_key
-
-
-centralnic: true
-cocca: true
-nzrs: false
 
