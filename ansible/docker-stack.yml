@@ -13,11 +13,6 @@
         src: templates/drs-stack.yml.j2
         dest: "{{ base_directory  }}/drs-stack.yml"
         
-    - name: Create support environment file
-      notify: deploy stack
-      template: 
-        src: templates/stack_env.j2
-        dest: "{{ base_directory  }}/.stack_env"
 
 
   handlers:
