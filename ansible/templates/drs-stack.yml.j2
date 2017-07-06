@@ -1,15 +1,157 @@
 version: "3.1"
 
-{% set known_secrets = [] %}
 services:
-{% for service_name, spec in service_list.items() %}
-  {{ {service_name: spec} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False)  }}
-  {% known_secrets += spec.secrets %}
-{% endfor %}
-  
-secrets:
-{% for secret in known_secrets | unqiue %}
-{% if secret in docker_secrets %}
- {{ secret }}: {{ docker_secrets[secret] }}
+  migrate:
+    image: {{ images.api.image  }}:{{ images.api.tag  }}
+    command: {{ migrate_command }}
+    environment: {{ api_environment }}
+    secrets: {{ api_secrets }}
+    volumes: {{ api_volumes }}
+    depends_on:
+    - domaindb
+    deploy:
+        restart_policy:
+            condition: on-failure
+            max_attempts: 1
+
+  rabbitmq:
+    image: {{ images.rabbitmq.image  }}:{{ images.rabbitmq.tag  }}
+    environment: {{ rabbitmq_environment }}
+    ports:
+    - 15672:15672
+
+  celery:
+    image: {{ images.api.image  }}:{{ images.api.tag  }}
+    command: {{celery_command}}
+    deploy: {{ celery_deploy }}
+    environment: {{ celery_environment }}
+    secrets: {{ celery_secrets }}
+    volumes: {{ celery_volumes }}
+    depends_on:
+      - rabbitmq
+
+  nginx:
+    image: {{ images.nginx.image  }}:{{ images.nginx.tag  }}
+    command: {{ nginx_command }}
+    deploy: {{  nginx_deploy  }}
+    ports: {{nginx_ports}}
+    secrets: {{nginx_secrets}}
+
+  domaindb:
+    image: {{ images.domaindb.image  }}:{{ images.domaindb.tag  }}
+    environment: {{domaindb_environment}}
+    ports:
+      - 3306:3306
+    secrets: {{ domaindb_secrets }}
+  {% if domaindb.volumes %}
+    volumes: {{ domaindb_volumes }}
+  {% endif %}
+
+  api:
+    image: {{ images.api.image  }}:{{ images.api.tag  }}
+    command: {{ api_command }}
+    environment: {{ api_environment }}
+    volumes: {{ api_volumes }}
+    secrets: {{ api_secrets }}
+    depends_on:
+    - rabbitmq
+    - domaindb
+    deploy: {{ api_deploy }}
+
+  memcached:
+    image: {{ images.memcached.image  }}:{{ images.memcached.tag  }}
+    deploy: {{ memcached.deploy }}
+
+{% if cocca %}
+  cocca:
+    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
+    command: {{cocca_command}}
+    depends_on:
+    - rabbitmq
+    deploy: {{ cocca_deploy }}
+    environment: {{ cocca_environment }}
+    healthcheck: {{ cocca_healthcheck }}
+    secrets: {{ cocca_secrets }}
+  {% if cocca_volumes %}
+    volumes: {{ cocca_volumes  }}
+  {% endif %}
 {% endif %}
-{% endfor %}
+
+{% if centralnic %}
+  centralnic: 
+    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
+    command: {{ centralnic_command }}
+    depends_on:
+    - rabbitmq
+    deploy: {{ centralnic_deploy }}
+    environment: {{ centralnic_environment }}
+    healthcheck: {{ centralnic_healthcheck }}
+    secrets: {{ centralnic_secrets }}
+  {% if centralnic_volumes %}
+    volumes: {{ centralnic_volumes }}
+  {% endif %}
+{% endif %}
+
+{% if nzrs %}
+  nzrs: 
+    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
+    command: {{ nzrs_command }}
+    depends_on:
+    - rabbitmq
+    deploy: {{ nzrs_deploy }}
+    environment: {{ nzrs_environment }}
+    healthcheck: {{ nzrs_healthcheck }}
+    secrets: {{ nzrs_secrets }}
+  {% if nzrs_volumes %}
+    volumes: {{ nzrs_volumes }}
+  {% endif %}
+{% endif %}
+      
+
+secrets:
+  cocca_test_login:
+    external: true
+  cocca_test_password:
+    external: true
+  centralnic_test_login:
+    external: true
+  centralnic_test_password:
+    external: true
+  mysql_root_password:
+    external: true
+  mysql_password:
+    external: true
+  mysql_database:
+    external: true
+  mysql_user:
+    external: true
+  centralnic_test_config:
+    external: true
+  cocca_test_config:
+    external: true
+  celery_sentry_dsn:
+    external: true
+  domain_api_sentry_dsn:
+    external: true
+  nodepp_sentry_dsn:
+    external: true
+  site.key:
+    external: true
+  site.crt:
+    external: true
+  django_secret_key:
+    external: true
+  jwt_secret_key:
+    external: true
+  nzrs_test_login:
+    external: true
+  nzrs_test_password:
+    external: true
+  nzrs_test_config:
+    external: true
+  nzrs-epp-test.pem:
+    external: true
+  nzrs-epp-test.key:
+    external: true
+  logzio_token:
+    external: true 
