@@ -184,6 +184,7 @@ celery_environment:
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
   RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
   SENTRY_ENVIRONMENT: "{{ sentry_environment }}"
+  MYSQL_HOST: "{{ database_host  }}"
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
@@ -224,6 +225,7 @@ api_environment:
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  MYSQL_HOST: "{{ database_host  }}"
   RELEASE_VERSION: "{{ images.api.tag  }}"
   RABBITMQ_HOST: "{{ rabbitmq_host  }}"
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
