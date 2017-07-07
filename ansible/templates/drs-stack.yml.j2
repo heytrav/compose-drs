@@ -2,127 +2,27 @@
 version: "3.1"
 
 services:
-  migrate:
-    image: {{ images.api.image  }}:{{ images.api.tag  }}
-    command: {{ migrate_command }}
-    environment: {{ api_environment }}
-    secrets: {{ api_secrets }}
-    volumes: {{ api_volumes }}
-    depends_on:
-    - domaindb
-    deploy:
-        restart_policy:
-            condition: on-failure
-            max_attempts: 1
-
-  rabbitmq:
-    image: {{ images.rabbitmq.image  }}:{{ images.rabbitmq.tag  }}
-    environment: {{ rabbitmq_environment }}
-    ports:
-    - 15672:15672
-
-  celery:
-    image: {{ images.api.image  }}:{{ images.api.tag  }}
-    command: {{celery_command}}
-    deploy: {{ celery_deploy }}
-    environment: {{ celery_environment }}
-    secrets: {{ celery_secrets }}
-    volumes: {{ celery_volumes }}
-    depends_on:
-      - rabbitmq
-
-  nginx:
-    image: {{ images.nginx.image  }}:{{ images.nginx.tag  }}
-    command: {{ nginx_command }}
-    deploy: {{  nginx_deploy  }}
-    ports: {{nginx_ports}}
-    secrets: {{nginx_secrets}}
-
-  domaindb:
-    image: {{ images.domaindb.image  }}:{{ images.domaindb.tag  }}
-    environment: {{domaindb_environment}}
-    ports:
-      - 3306:3306
-    secrets: {{ domaindb_secrets }}
-  {% if domaindb.volumes %}
-    volumes: {{ domaindb_volumes }}
-  {% endif %}
-
-  api:
-    image: {{ images.api.image  }}:{{ images.api.tag  }}
-    command: {{ api_command }}
-    environment: {{ api_environment }}
-    volumes: {{ api_volumes }}
-    secrets: {{ api_secrets }}
-    depends_on:
-    - rabbitmq
-    - domaindb
-    deploy: {{ api_deploy }}
-
-  memcached:
-    image: {{ images.memcached.image  }}:{{ images.memcached.tag  }}
-    deploy: {{ memcached.deploy }}
-
-{% if cocca %}
-  cocca:
-    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
-    command: {{cocca_command}}
-    depends_on:
-    - rabbitmq
-    deploy: {{ cocca_deploy }}
-    environment: {{ cocca_environment }}
-    healthcheck: {{ cocca_healthcheck }}
-    secrets: {{ cocca_secrets }}
-  {% if cocca_volumes %}
-    volumes: {{ cocca_volumes  }}
-  {% endif %}
-{% endif %}
-
-{% if centralnic %}
-  centralnic: 
-    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
-    command: {{ centralnic_command }}
-    depends_on:
-    - rabbitmq
-    deploy: {{ centralnic_deploy }}
-    environment: {{ centralnic_environment }}
-    healthcheck: {{ centralnic_healthcheck }}
-    secrets: {{ centralnic_secrets }}
-  {% if centralnic_volumes %}
-    volumes: {{ centralnic_volumes }}
-  {% endif %}
-{% endif %}
+  {{ {"migrate": migrate_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"domaindb": domaindb_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"rabbitmq": rabbitmq_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"memcached": memcached_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"nginx": nginx_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"celery": celery_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"api": api_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
 
 {% if nzrs %}
-  nzrs: 
-    image: {{ images.nodepp.image  }}:{{ images.nodepp.tag  }}
-    command: {{ nzrs_command }}
-    depends_on:
-    - rabbitmq
-    deploy: {{ nzrs_deploy }}
-    environment: {{ nzrs_environment }}
-    healthcheck: {{ nzrs_healthcheck }}
-    secrets: {{ nzrs_secrets }}
-  {% if nzrs_volumes %}
-    volumes: {{ nzrs_volumes }}
-  {% endif %}
-{% endif %}
-      
-
-{% set known_secrets = api_secrets + nginx_secrets + celery_secrets + domaindb_secrets %}
-{% if nzrs %}
-{%  known_secrets = known_secrets + nzrs_secrets %}
+  {{ {"nzrs": nzrs_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
 {% endif %}
 {% if centralnic %}
-{%  known_secrets = known_secrets + centralnic_secrets %}
+  {{ {"centralnic": centralnic_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
 {% endif %}
 {% if cocca %}
-{%  known_secrets = known_secrets + cocca_secrets %}
+  {{ {"cocca": cocca_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
 {% endif %}
 
-
-{% for secret in known_secrets | unqiue %}
+secrets:
+{% for secret in known_secrets %}
 {% if secret in docker_secrets %}
- {{ secret }}: {{ docker_secrets[secret] }}
-{% endif %}
-{% endfor %}
+ {{ secret }}: 
+   {{ docker_secrets[secret] | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
+{% endif %}{% endfor %}
