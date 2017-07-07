@@ -2,22 +2,22 @@
 version: "3.1"
 
 services:
-  {{ {"migrate": migrate_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
-  {{ {"domaindb": domaindb_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
-  {{ {"rabbitmq": rabbitmq_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
-  {{ {"memcached": memcached_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
-  {{ {"nginx": nginx_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
-  {{ {"celery": celery_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
-  {{ {"api": api_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"migrate": migrate_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"domaindb": domaindb_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"rabbitmq": rabbitmq_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"memcached": memcached_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"nginx": nginx_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"celery": celery_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"api": api_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
 
 {% if nzrs %}
-  {{ {"nzrs": nzrs_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"nzrs": nzrs_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
 {% endif %}
 {% if centralnic %}
-  {{ {"centralnic": centralnic_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"centralnic": centralnic_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
 {% endif %}
 {% if cocca %}
-  {{ {"cocca": cocca_service} | to_nice_yaml( width=50, explicit_start=False, explicit_end=False) }}
+  {{ {"cocca": cocca_service} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
 {% endif %}
 
 secrets:
