@@ -18,7 +18,7 @@ images:
     tag: 1.2.21
   nodepp:
     image: quay.io/heytrav/nodepp
-    tag: 1.2.6
+    tag: 1.2.7
   nginx:
     image: quay.io/heytrav/drs-nginx
     tag: 0.1.0
@@ -42,6 +42,7 @@ cocca_environment:
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  SENTRY_DSN_FILE: /run/secrets/nodepp_sentry_dsn
   RELEASE_VERSION: "{{ images.nodepp.tag  }}"
   RABBITMQ_HOST: "{{ rabbitmq_host  }}"
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
@@ -77,6 +78,7 @@ centralnic_environment:
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  SENTRY_DSN_FILE: /run/secrets/nodepp_sentry_dsn
   RELEASE_VERSION: "{{ images.nodepp.tag  }}"
   RABBITMQ_HOST: "{{ rabbitmq_host  }}"
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
@@ -114,6 +116,7 @@ nzrs_environment:
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  SENTRY_DSN_FILE: /run/secrets/nodepp_sentry_dsn
   RELEASE_VERSION: "{{ images.nodepp.tag  }}"
   RABBITMQ_HOST: "{{ rabbitmq_host  }}"
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
