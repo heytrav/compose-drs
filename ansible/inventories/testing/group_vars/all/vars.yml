@@ -37,7 +37,7 @@ services:
   nzrs: "{{ nzrs_service  }}"
   cocca: "{{ cocca_service  }}"
 
-volumes:
+service_volumes:
   domaindb:
     - /var/lib/mysql:/var/lib/mysql
 

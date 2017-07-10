@@ -25,6 +25,11 @@
       set_fact:
         known_secrets: "{{ known_secrets|unique }}"
 
+    - name: Add volumes to services
+      set_fact:
+        services: "{{services | combine(service_volumes, recursive=True)}}"
+
+
     - name: Create docker compose spec
       notify:
         - deploy stack

@@ -2,16 +2,19 @@
 
 base_directory: ~/workspace/innovation/compose-drs
 
-cocca_volumes:
-  - ../nodepp:/opt/project/node-epp
-centralnic_volumes:
-  - ../nodepp:/opt/project/node-epp
-domaindb_volumes:
-  - ../database/mysql:/var/lib/mysql
-celery_volumes:
-  - ../drs-project:/usr/local/domain-api
-api_volumes:
-  - ../drs-project:/usr/local/domain-api
+service_volumes:
+  cocca:
+    volumes:
+      - ../nodepp:/opt/project/node-epp
+  centralnic:
+    volumes:
+      - ../nodepp:/opt/project/node-epp
+  domaindb:
+    volumes:
+      - ../database/mysql:/var/lib/mysql
+  api:
+    volumes:
+      - ../drs-project:/usr/local/domain-api
 
 sentry_environment: development
 
