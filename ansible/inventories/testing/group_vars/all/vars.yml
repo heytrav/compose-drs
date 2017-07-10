@@ -17,4 +17,5 @@ services:
 
 service_volumes:
   domaindb:
-    - /var/lib/mysql:/var/lib/mysql
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
