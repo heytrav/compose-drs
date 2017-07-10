@@ -23,7 +23,6 @@ images:
     tag: latest
 
 
-nzrs_volumes:
 sentry_environment: testing
 
 services:
@@ -38,8 +37,7 @@ services:
   nzrs: "{{ nzrs_service  }}"
   cocca: "{{ cocca_service  }}"
 
-cocca_volumes:
-centralnic_volumes:
-domaindb_volumes:
-celery_volumes:
-api_volumes:
+volumes:
+  domaindb:
+    - /var/lib/mysql:/var/lib/mysql
+

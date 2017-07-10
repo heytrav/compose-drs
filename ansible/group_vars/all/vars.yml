@@ -409,7 +409,6 @@ migrate_service:
   command: "{{ migrate_command }}"
   environment: "{{ api_environment }}"
   secrets: "{{ api_secrets }}"
-  volumes: "{{ api_volumes }}"
   depends_on:
   - domaindb
   deploy:
@@ -428,7 +427,6 @@ celery_service:
   deploy: "{{ celery_deploy }}"
   environment: "{{ celery_environment }}"
   secrets: "{{ celery_secrets }}"
-  volumes: "{{ celery_volumes }}"
   depends_on:
     - rabbitmq
 nginx_service:
@@ -443,12 +441,10 @@ domaindb_service:
   ports:
     - 3306:3306
   secrets: "{{ domaindb_secrets }}"
-  volumes: "{{ domaindb_volumes }}"
 api_service:
   image: "{{ images.api.image  }}:{{ images.api.tag  }}"
   command: "{{ api_command }}"
   environment: "{{ api_environment }}"
-  volumes: "{{ api_volumes }}"
   secrets: "{{ api_secrets }}"
   deploy: "{{ api_deploy }}"
   depends_on:
@@ -468,7 +464,6 @@ cocca_service:
   environment: "{{ cocca_environment }}"
   healthcheck: "{{ cocca_healthcheck }}"
   secrets: "{{ cocca_secrets }}"
-  volumes: "{{ cocca_volumes  }}"
 
 centralnic_service: 
   image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
@@ -479,7 +474,6 @@ centralnic_service:
   environment: "{{ centralnic_environment }}"
   healthcheck: "{{ centralnic_healthcheck }}"
   secrets: "{{ centralnic_secrets }}"
-  volumes: "{{ centralnic_volumes }}"
 
 nzrs_service: 
   image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
@@ -490,4 +484,3 @@ nzrs_service:
   environment: "{{ nzrs_environment }}"
   healthcheck: "{{ nzrs_healthcheck }}"
   secrets: "{{ nzrs_secrets }}"
-  volumes: "{{ nzrs_volumes }}"
