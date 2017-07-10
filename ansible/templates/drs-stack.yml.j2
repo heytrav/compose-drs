@@ -1,7 +1,7 @@
 
 version: "3.1"
 services:
-{% for service_name, spec in services.items() %} {% if service_name in volumes %} {% do spec.update('volumes', volumes.service_name) %} {% endif %}
+{% for service_name, spec in services.items() %}
   {{ {service_name: spec} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False)  }}
 {% endfor %}
 
