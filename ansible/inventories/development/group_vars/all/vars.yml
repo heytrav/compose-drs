@@ -1,6 +1,18 @@
 ---
 
 base_directory: ~/workspace/innovation/compose-drs
+sentry_environment: development
+
+services:
+  rabbitmq: "{{ rabbitmq_service }}" 
+  domaindb: "{{ domaindb_service }}" 
+  nginx: "{{ nginx_service  }}"
+  memcached: "{{ memcached_service  }}"
+  migrate: "{{ migrate_service  }}"
+  celery: "{{ celery_service  }}"
+  api: "{{ api_service  }}"
+  cocca: "{{ cocca_service  }}"
+  centralnic: "{{ centralnic_service  }}"
 
 service_volumes:
   cocca:
@@ -15,16 +27,3 @@ service_volumes:
   api:
     volumes:
       - ../drs-project:/usr/local/domain-api
-
-sentry_environment: development
-
-services:
-  rabbitmq: "{{ rabbitmq_service }}" 
-  domaindb: "{{ domaindb_service }}" 
-  nginx: "{{ nginx_service  }}"
-  memcached: "{{ memcached_service  }}"
-  migrate: "{{ migrate_service  }}"
-  celery: "{{ celery_service  }}"
-  api: "{{ api_service  }}"
-  cocca: "{{ cocca_service  }}"
-  centralnic: "{{ centralnic_service  }}"

@@ -1,28 +1,6 @@
 ---
 
 base_directory: /home/ubuntu
-
-images:
-  rabbitmq:
-    image: quay.io/heytrav/rabbitmq
-    tag: latest
-  mariadb:
-    image: mysql
-    tag: latest
-  api:
-    image: quay.io/heytrav/domain-api
-    tag: 1.2.20
-  nodepp:
-    image: quay.io/heytrav/nodepp
-    tag: 1.2.5
-  nginx:
-    image: quay.io/heytrav/drs-nginx
-    tag: 0.1.0
-  memcached:
-    image: memcached
-    tag: latest
-
-
 sentry_environment: testing
 
 services:
@@ -40,4 +18,3 @@ services:
 service_volumes:
   domaindb:
     - /var/lib/mysql:/var/lib/mysql
-
