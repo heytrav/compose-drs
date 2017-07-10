@@ -1,13 +1,8 @@
 ---
 
 base_directory: ~/workspace/innovation/compose-drs
-
-celery_volumes:
-  - ../drs-project:/usr/local/domain-api
-api_volumes:
-  - ../drs-project:/usr/local/domain-api
-
 sentry_environment: guest-development
+
 services:
   rabbitmq: "{{ rabbitmq_service }}" 
   domaindb: "{{ domaindb_service }}" 
@@ -17,3 +12,14 @@ services:
   celery: "{{ celery_service  }}"
   api: "{{ api_service  }}"
   cocca: "{{ cocca_service  }}"
+
+service_volumes:
+  cocca:
+    volumes:
+      - ../nodepp:/opt/project/node-epp
+  domaindb:
+    volumes:
+      - ../database/mysql:/var/lib/mysql
+  api:
+    volumes:
+      - ../drs-project:/usr/local/domain-api
