@@ -18,17 +18,13 @@ images:
     tag: 1.2.21
   nodepp:
     image: quay.io/heytrav/nodepp
-    tag: 1.2.7
+    tag: 1.2.8
   nginx:
     image: quay.io/heytrav/drs-nginx
     tag: 0.1.0
   memcached:
     image: memcached
     tag: latest
-
-centralnic: false
-nzrs: false
-cocca: true
 
 cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
 cocca_healthcheck: 
@@ -108,8 +104,6 @@ nzrs_healthcheck:
   interval: 1m
   timeout: 20s
   retries: 3
-nzrs_volumes:
-  - ../nodepp:/opt/project/node-epp
 nzrs_environment:
   EPP_LOGIN_FILE: /run/secrets/nzrs_test_login
   EPP_PASSWORD_FILE: /run/secrets/nzrs_test_password
@@ -164,8 +158,6 @@ domaindb_secrets:
   - mysql_root_password
   - mysql_database
   - mysql_user
-domaindb_volumes:
-  - ../database/mysql:/var/lib/mysql
 
 migrate_command: ["python3", "manage.py", "migrate"]
 
@@ -176,8 +168,6 @@ celery_command:
   - worker
   - -l
   - info
-celery_volumes:
-  - ../drs-project:/usr/local/domain-api
 celery_environment:
   RELEASE_VERSION: "{{ images.api.tag  }}"
   RABBITMQ_HOST: "{{ rabbitmq_host  }}"
@@ -212,8 +202,6 @@ celery_deploy:
       delay: 10s
 
 api_command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
-api_volumes:
-  - ../drs-project:/usr/local/domain-api
 api_environment:
   SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
   MYSQL_USER_FILE: /run/secrets/mysql_user
