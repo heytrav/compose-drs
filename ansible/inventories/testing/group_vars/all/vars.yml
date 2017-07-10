@@ -37,3 +37,9 @@ services:
   centralnic: "{{ centralnic_service  }}"
   nzrs: "{{ nzrs_service  }}"
   cocca: "{{ cocca_service  }}"
+
+cocca_volumes:
+centralnic_volumes:
+domaindb_volumes:
+celery_volumes:
+api_volumes:
