@@ -2,6 +2,12 @@
 manager1
 
 [workers]
-150.242.40.210
-150.242.40.216
-150.242.40.218
+manager2
+worker1
+worker2
+
+[swarm-nodes]
+manager1
+manager2
+worker1
+worker2
