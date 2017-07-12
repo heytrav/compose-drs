@@ -97,9 +97,12 @@ cc_servers: []
 #  - groups: #
 
 
-# hash containing a mapping between servername -> pre-allocated floating ip
+# hash containing a list of maps with name and ip, .e.g.
+# - {name: foo-server, ip: 8.8.8.8 }
 # (get one with `openstack floating ip create public-net`)
-cc_floating_ips: {}
+cc_floating_ips: []
+#
+#
 # if true, assume hosts can be reached on their primary fixed ip
 cc_access_via_vpn: false
 

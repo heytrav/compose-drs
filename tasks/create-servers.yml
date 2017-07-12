@@ -61,4 +61,4 @@
     server: "{{ item.name }}"
   with_items:
     - "{{ cc_floating_ips }}"
-  when: "cc_floating_ips is defined"
+  when: "cc_floating_ips is defined and (cc_floating_ips | length > 0)"
