@@ -20,6 +20,12 @@ cc_ssh_user: ubuntu
 cc_prefix:
 
 cc_auth_url: https://api.cloud.catalyst.net.nz:5000/v2.0
+cc_auth_credentials_group: openstack
+# These need to be set if you want to use tasks/create-rc-file.yml
+# cc_tenant_name
+# cc_openstack_username
+# cc_openstack_password
+# cc_region
 
 cc_default_domain: "openstacklocal"
 cc_default_nameservers: [202.78.247.197, 202.78.247.198, 202.78.247.199]

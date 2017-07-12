@@ -1,0 +1,16 @@
+- name: Create/manage openstack group
+  group:
+    name: "{{ cc_auth_credentials_group }}"
+
+- name: Openstack credentials
+  copy:
+    dest: "/etc/openstack.sh"
+    owner: root
+    group: "{{ cc_auth_credentials_group }}"
+    mode: 0640
+    content: |
+               export OS_AUTH_URL={{ cc_auth_url }}
+               export OS_TENANT_NAME={{ cc_tenant_name }}
+               export OS_USERNAME={{ cc_openstack_username }}
+               export OS_PASSWORD={{ cc_openstack_password }}
+               export OS_REGION_NAME={{ cc_region }}
