@@ -10,7 +10,7 @@
     size: "{{ item.size }}"
   with_items: "{{ cc_servers | json_query(query) }}"
   vars:
-    query: "[?name=='{{ ansible_nodename }}'] | [0].mounts"
+    query: "[?name=='{{ ansible_nodename | default(inventory_hostname) }}'] | [0].mounts"
 
 - name: Format volumes
   filesystem:
@@ -18,7 +18,7 @@
     fstype: "{{ item.fstype | default(cc_default_server_fs_type) }}"
   with_items: "{{ cc_servers | json_query(query) }}"
   vars:
-    query: "[?name=='{{ ansible_nodename }}'] | [0].mounts"
+    query: "[?name=='{{ ansible_nodename  | default(inventory_hostname) }}'] | [0].mounts"
 
 - name: Mount volumes
   mount:
@@ -28,4 +28,4 @@
     src: "/dev/{{ cc_volume_group_name }}/{{ item.name }}"
   with_items: "{{ cc_servers | json_query(query) }}"
   vars:
-    query: "[?name=='{{ ansible_nodename }}'] | [0].mounts"
+    query: "[?name=='{{ ansible_nodename | default(inventory_hostname) }}'] | [0].mounts"
