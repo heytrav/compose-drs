@@ -1,7 +1,7 @@
 ---
 
-base_directory: /home/ubuntu
-sentry_environment: testing
+base_directory: ~/workspace/innovation/compose-drs
+sentry_environment: guest-development
 
 services:
   rabbitmq: "{{ rabbitmq_service }}" 
@@ -11,11 +11,15 @@ services:
   migrate: "{{ migrate_service  }}"
   celery: "{{ celery_service  }}"
   api: "{{ api_service  }}"
-  centralnic: "{{ centralnic_service  }}"
-  nzrs: "{{ nzrs_service  }}"
   cocca: "{{ cocca_service  }}"
 
 service_volumes:
+  cocca:
+    volumes:
+      - ../nodepp:/opt/project/node-epp
   domaindb:
     volumes:
-      - /var/lib/mysql:/var/lib/mysql
+      - ../database/mysql:/var/lib/mysql
+  api:
+    volumes:
+      - ../drs-project:/usr/local/domain-api

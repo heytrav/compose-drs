@@ -5,6 +5,482 @@ rabbitmq_host: rabbitmq
 rabbitmq_port: 5672
 rabbitmq_default_vhost: /
 
+
+images:
+  rabbitmq:
+    image: quay.io/heytrav/rabbitmq
+    tag: latest
+  domaindb:
+    image: mysql
+    tag: latest
+  api:
+    image: quay.io/heytrav/domain-api
+    tag: provider-in-contacts
+  nodepp:
+    image: quay.io/heytrav/nodepp
+    tag: 1.2.8
+  nginx:
+    image: quay.io/heytrav/drs-nginx
+    tag: 0.1.0
+  memcached:
+    image: memcached
+    tag: latest
+
+cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+cocca_healthcheck: 
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+  interval: 1m
+  timeout: 20s
+  retries: 3
+cocca_environment:
+  EPP_LOGIN_FILE: /run/secrets/cocca_test_login
+  EPP_PASSWORD_FILE: /run/secrets/cocca_test_password
+  RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+  RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+  RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  SENTRY_DSN_FILE: /run/secrets/nodepp_sentry_dsn
+  RELEASE_VERSION: "{{ images.nodepp.tag  }}"
+  RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+  RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+  RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+cocca_secrets:
+  - cocca_test_login
+  - cocca_test_password
+  - cocca_test_config
+  - nodepp_sentry_dsn
+  - logzio_token
+  - rabbitmq_default_user
+  - rabbitmq_default_pass
+  - rabbitmq_erlang_cookie
+cocca_deploy:
+  replicas: 1
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+
+centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+centralnic_healthcheck: 
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+  interval: 1m
+  timeout: 20s
+  retries: 3
+centralnic_environment:
+  EPP_LOGIN_FILE: /run/secrets/centralnic_test_login
+  EPP_PASSWORD_FILE: /run/secrets/centralnic_test_password
+  RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+  RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+  RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  SENTRY_DSN_FILE: /run/secrets/nodepp_sentry_dsn
+  RELEASE_VERSION: "{{ images.nodepp.tag  }}"
+  RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+  RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+  RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+centralnic_secrets:
+  - centralnic_test_login
+  - centralnic_test_password
+  - centralnic_test_config
+  - nodepp_sentry_dsn
+  - logzio_token
+  - rabbitmq_default_user
+  - rabbitmq_default_pass
+  - rabbitmq_erlang_cookie
+centralnic_deploy:
+    replicas: 1
+    restart_policy:
+      condition: on-failure
+      delay: 10s
+    update_config:
+      parallelism: 1
+      delay: 5s
+      failure_action: pause
+
+nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
+nzrs_healthcheck: 
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
+  interval: 1m
+  timeout: 20s
+  retries: 3
+nzrs_environment:
+  EPP_LOGIN_FILE: /run/secrets/nzrs_test_login
+  EPP_PASSWORD_FILE: /run/secrets/nzrs_test_password
+  RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+  RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+  RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  SENTRY_DSN_FILE: /run/secrets/nodepp_sentry_dsn
+  RELEASE_VERSION: "{{ images.nodepp.tag  }}"
+  RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+  RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+  RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+nzrs_secrets:
+  - nzrs_test_login
+  - nzrs_test_password
+  - nzrs_test_config
+  - nodepp_sentry_dsn
+  - nzrs-epp.pem
+  - nzrs-epp.key
+  - logzio_token
+  - rabbitmq_default_user
+  - rabbitmq_default_pass
+  - rabbitmq_erlang_cookie
+nzrs_deploy:
+  replicas: 2
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+
+
+rabbitmq_environment:
+  RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+  RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+  RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+  RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+  RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+rabbitmq_secrets:
+  - rabbitmq_default_user
+  - rabbitmq_default_pass
+  - rabbitmq_erlang_cookie
+
+domaindb_environment:
+  MYSQL_USER_FILE: /run/secrets/mysql_user
+  MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+  MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+domaindb_secrets:
+  - mysql_password
+  - mysql_root_password
+  - mysql_database
+  - mysql_user
+
+migrate_command: ["python3", "manage.py", "migrate"]
+
+celery_command:
+  - celery
+  - -A
+  - application
+  - worker
+  - -l
+  - info
+celery_environment:
+  RELEASE_VERSION: "{{ images.api.tag  }}"
+  RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+  RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+  RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+  SENTRY_ENVIRONMENT: "{{ sentry_environment }}"
+  MYSQL_HOST: "{{ database_host  }}"
+  RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+  RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+  RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  SENTRY_DSN_FILE: /run/secrets/celery_sentry_dsn
+  MYSQL_USER_FILE: /run/secrets/mysql_user
+  MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+  MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+  DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+  JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+  LOGZIO_TOKEN_FILE: /run/secrets/logzio_token
+celery_secrets:
+  - mysql_database
+  - mysql_user
+  - mysql_password
+  - celery_sentry_dsn
+  - django_secret_key
+  - jwt_secret_key
+  - logzio_token
+  - rabbitmq_default_user
+  - rabbitmq_default_pass
+  - rabbitmq_erlang_cookie
+celery_deploy:
+  restart_policy:
+      condition: on-failure
+      delay: 10s
+
+api_command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+api_environment:
+  SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
+  MYSQL_USER_FILE: /run/secrets/mysql_user
+  MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+  MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+  DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+  JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+  LOGZIO_TOKEN_FILE: /run/secrets/logzio_token
+  RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+  RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+  RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  MYSQL_HOST: "{{ database_host  }}"
+  RELEASE_VERSION: "{{ images.api.tag  }}"
+  RABBITMQ_HOST: "{{ rabbitmq_host  }}"
+  RABBITMQ_PORT: "{{ rabbitmq_port  }}"
+  RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
+  SENTRY_ENVIRONMENT: "{{ sentry_environment }}"
+api_secrets:
+  - mysql_database
+  - mysql_user
+  - mysql_password
+  - domain_api_sentry_dsn
+  - django_secret_key
+  - jwt_secret_key
+  - logzio_token
+  - rabbitmq_default_user
+  - rabbitmq_default_pass
+  - rabbitmq_erlang_cookie
+api_deploy:
+  replicas: 1
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+
+nginx_secrets:
+  - site.key
+  - site.crt
+nginx_command: ["nginx"]
+nginx_ports: 
+  - 443:443
+nginx_deploy:
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+
+memcached_deploy:
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  resources:
+    limits:
+      memory: 64M
+    reservations:
+      memory: 64M
+        
+docker_secrets:
+  cocca_test_login:
+    external: true
+  cocca_test_password:
+    external: true
+  cocca_test_config:
+    external: true
+  centralnic_test_login:
+    external: true
+  centralnic_test_password:
+    external: true
+  centralnic_test_config:
+    external: true
+  mysql_root_password:
+    external: true
+  mysql_password:
+    external: true
+  mysql_database:
+    external: true
+  mysql_user:
+    external: true
+  celery_sentry_dsn:
+    external: true
+  domain_api_sentry_dsn:
+    external: true
+  nodepp_sentry_dsn:
+    external: true
+  site.key:
+    external: true
+  site.crt:
+    external: true
+  django_secret_key:
+    external: true
+  jwt_secret_key:
+    external: true
+  nzrs_test_login:
+    external: true
+  nzrs_test_password:
+    external: true
+  nzrs_test_config:
+    external: true
+  nzrs-epp.pem:
+    external: true
+  nzrs-epp.key:
+    external: true
+  logzio_token:
+    external: true 
+  rabbitmq_default_user:
+    external: true
+  rabbitmq_default_pass:
+    external: true
+  rabbitmq_erlang_cookie:
+    external: true
+
+
+centralnic_config:
+  # nodepp config options
+  name: centralnic-test
+  config:
+    host: epp-ote.centralnic.com
+    port: 700
+    ssl: true
+    entities:
+      - domain
+      - contact
+      - host
+    extension:
+      - DNSSEC
+    extensionClasses:
+      - extension: DNSSEC
+        className: SecDnsExtension 
+    namespaces:
+      epp:
+        xmlns: urn:ietf:params:xml:ns:epp-1.0
+      domain:
+        xmlns: urn:ietf:params:xml:ns:domain-1.0
+      contact:
+        xmlns: urn:ietf:params:xml:ns:contact-1.0
+      host:
+        xmlns: urn:ietf:params:xml:ns:host-1.0 
+      DNSSEC:
+        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+
+cocca_config:
+  # nodepp config options
+  name: cocca-test
+  config:
+    host: ote.coccaregistry.org
+    port: 700
+    ssl: true
+    entities:
+      - domain
+      - contact
+      - host
+    extension:
+      - DNSSEC
+    extensionClasses:
+      - extension: DNSSEC
+        className: SecDnsExtension 
+    namespaces:
+      epp:
+        xmlns: urn:ietf:params:xml:ns:epp-1.0
+      domain:
+        xmlns: urn:ietf:params:xml:ns:domain-1.0
+      contact:
+        xmlns: urn:ietf:params:xml:ns:contact-1.0
+      host:
+        xmlns: urn:ietf:params:xml:ns:host-1.0 
+      DNSSEC:
+        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+
+nzrs_config:
+  name: nzrs-test
+  config:
+    host: srstestepp.srs.net.nz
+    cert: /run/secrets/nzrs-epp.pem
+    key: /run/secrets/nzrs-epp.key
+    port: 700
+    ssl: true
+    entities:
+      - domain
+      - contact
+    extension:
+      - DNSSEC
+    extensionClasses:
+      - extension: DNSSEC
+        className: SecDnsExtension 
+    namespaces:
+      epp:
+        xmlns: urn:ietf:params:xml:ns:epp-1.0
+      domain:
+        xmlns: urn:ietf:params:xml:ns:domain-1.0
+      contact:
+        xmlns: urn:ietf:params:xml:ns:contact-1.0
+      DNSSEC:
+        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+
+
 nodepp_sentry_webhook_url: vault_nodepp_sentry_webhook_url
 api_sentry_webhook_url: vault_api_sentry_webhook_url
 celery_sentry_webhook_url: vault_celery_sentry_webhook_url
+
+
+migrate_service:
+  image: "{{ images.api.image  }}:{{ images.api.tag  }}"
+  command: "{{ migrate_command }}"
+  environment: "{{ api_environment }}"
+  secrets: "{{ api_secrets }}"
+  depends_on:
+  - domaindb
+  deploy:
+      restart_policy:
+          condition: on-failure
+          max_attempts: 1
+rabbitmq_service:
+  image: "{{ images.rabbitmq.image  }}:{{ images.rabbitmq.tag  }}"
+  environment: "{{ rabbitmq_environment }}"
+  secrets: "{{ rabbitmq_secrets }}"
+  ports:
+  - 15672:15672
+celery_service:
+  image: "{{ images.api.image  }}:{{ images.api.tag  }}"
+  command: "{{celery_command}}"
+  deploy: "{{ celery_deploy }}"
+  environment: "{{ celery_environment }}"
+  secrets: "{{ celery_secrets }}"
+  depends_on:
+    - rabbitmq
+nginx_service:
+  image: "{{ images.nginx.image  }}:{{ images.nginx.tag  }}"
+  command: "{{ nginx_command }}"
+  deploy: "{{  nginx_deploy  }}"
+  ports: "{{ nginx_ports }}"
+  secrets: "{{ nginx_secrets }}"
+domaindb_service:
+  image: "{{ images.domaindb.image  }}:{{ images.domaindb.tag  }}"
+  environment: "{{domaindb_environment }}"
+  ports:
+    - 3306:3306
+  secrets: "{{ domaindb_secrets }}"
+api_service:
+  image: "{{ images.api.image  }}:{{ images.api.tag  }}"
+  command: "{{ api_command }}"
+  environment: "{{ api_environment }}"
+  secrets: "{{ api_secrets }}"
+  deploy: "{{ api_deploy }}"
+  depends_on:
+  - rabbitmq
+  - domaindb
+
+memcached_service:
+  image: "{{ images.memcached.image  }}:{{ images.memcached.tag  }}"
+  deploy: "{{ memcached_deploy }}"
+
+cocca_service:
+  image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
+  command: "{{cocca_command}}"
+  depends_on:
+  - rabbitmq
+  deploy: "{{ cocca_deploy }}"
+  environment: "{{ cocca_environment }}"
+  healthcheck: "{{ cocca_healthcheck }}"
+  secrets: "{{ cocca_secrets }}"
+
+centralnic_service: 
+  image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
+  command: "{{ centralnic_command }}"
+  depends_on:
+  - rabbitmq
+  deploy: "{{ centralnic_deploy }}"
+  environment: "{{ centralnic_environment }}"
+  healthcheck: "{{ centralnic_healthcheck }}"
+  secrets: "{{ centralnic_secrets }}"
+
+nzrs_service: 
+  image: "{{ images.nodepp.image  }}:{{ images.nodepp.tag  }}"
+  command: "{{ nzrs_command }}"
+  depends_on:
+  - rabbitmq
+  deploy: "{{ nzrs_deploy }}"
+  environment: "{{ nzrs_environment }}"
+  healthcheck: "{{ nzrs_healthcheck }}"
+  secrets: "{{ nzrs_secrets }}"

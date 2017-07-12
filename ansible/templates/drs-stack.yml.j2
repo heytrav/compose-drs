@@ -1,57 +1,14 @@
-version: "3.1"
 
+version: "3.1"
 services:
-{% for service_name, spec in service_list.items() %}
+{% for service_name, spec in services.items() %}
   {{ {service_name: spec} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False)  }}
 {% endfor %}
-  
 
-      
 
 secrets:
-  cocca_test_login:
-    external: true
-  cocca_test_password:
-    external: true
-  centralnic_test_login:
-    external: true
-  centralnic_test_password:
-    external: true
-  mysql_root_password:
-    external: true
-  mysql_password:
-    external: true
-  mysql_database:
-    external: true
-  mysql_user:
-    external: true
-  centralnic_test_config:
-    external: true
-  cocca_test_config:
-    external: true
-  celery_sentry_dsn:
-    external: true
-  domain_api_sentry_dsn:
-    external: true
-  nodepp_sentry_dsn:
-    external: true
-  site.key:
-    external: true
-  site.crt:
-    external: true
-  django_secret_key:
-    external: true
-  jwt_secret_key:
-    external: true
-  nzrs_test_login:
-    external: true
-  nzrs_test_password:
-    external: true
-  nzrs_test_config:
-    external: true
-  nzrs-epp-test.pem:
-    external: true
-  nzrs-epp-test.key:
-    external: true
-  logzio_token:
-    external: true 
+{% for secret in known_secrets %}
+{% if secret in docker_secrets %}
+ {{ secret }}: 
+   {{ docker_secrets[secret] | to_nice_yaml(width=50, explicit_start=False, explicit_end=False) }}
+{% endif %}{% endfor %}

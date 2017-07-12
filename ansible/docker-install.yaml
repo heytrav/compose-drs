@@ -1,0 +1,53 @@
+
+- name: Setup docker engine on compute instances
+  hosts: swarm-nodes
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Apt dist upgrade
+      apt:
+        upgrade: dist
+        autoremove: yes
+
+    - name: Install packages required for docker
+      apt:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - "linux-image-extra-{{ ansible_kernel }}"
+        - linux-image-extra-virtual
+
+    - name: Add Dockers official GPG key
+      apt_key:
+        url: "https://download.docker.com/linux/ubuntu/gpg"
+        state: present
+
+    - name: Add repo for Docker CE
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install docker community
+      apt:
+        name: docker-ce
+        state: latest
+      notify:
+        - Start docker
+
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        append: yes
+        groups: docker
+
+  handlers:
+    - name: Start docker
+      service:
+        name: docker
+        state: started
