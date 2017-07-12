@@ -1,6 +1,10 @@
 [{{ cc_environment }}]
 {% for server in cc_servers %}
+{% if ansible_runner is defined and ansible_runner == server.name %}
+{{ server.name }} ansible_connection=local ansible_nodename={{ server.name }}
+{% else %}
 {{ server.name }} ansible_host={{ server.ip }} ansible_nodename={{ server.name }}
+{% endif %}
 {% endfor %}
 
 [{{ cc_environment }}:vars]
