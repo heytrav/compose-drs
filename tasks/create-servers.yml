@@ -15,6 +15,7 @@
     display_name: "{{ item.name }}-data"
     size: "{{ item.volume_size_mb // 1024 }}"
   with_items: "{{ cc_servers }}"
+  when: "item.volume_size_mb is defined"
 
 - name: Create servers
   with_items: "{{ cc_servers }}"
@@ -27,6 +28,7 @@
     # it doesn't like commas ...
     meta: "{{ item.meta | default(omit) }}"
     nics: ["port-name={{ item.name }}"]
+    volume_size: "{{ item.boot_volume_size_gb | default(omit) }}"
     auto_ip: false
     userdata: |
                #cloud-config
@@ -53,6 +55,7 @@
     server: "{{ item.name }}"
     device: "{{ cc_volume_device_name }}"
   with_items: "{{ cc_servers }}"
+  when: "item.volume_size_mb is defined"
 
 - name: Assign floating ips
   os_floating_ip:

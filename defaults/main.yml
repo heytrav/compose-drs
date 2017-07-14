@@ -32,7 +32,7 @@ cc_default_nameservers: [202.78.247.197, 202.78.247.198, 202.78.247.199]
 
 # when using the dns-resolver-tenant task, you can add upstream resolvers for
 # various bits of private dns
-cc_local_resolver_upstreams:
+cc_local_resolver_upstreams: []
 # for example
 #  - {domain: 'wgtn.cat-it.co.nz', resolver: '192.168.8.140'}
 
@@ -50,7 +50,7 @@ cc_public_net_name: public-net
 cc_subnet_name: "{{ cc_network_name }}"
 cc_subnet_dhcp_start: "{{ cc_subnet_prefix }}.150"
 cc_subnet_dhcp_end: "{{ cc_subnet_prefix }}.200"
-cc_subnet_cidr: "{{ cc_subnet_prefix }}.1/24"
+cc_subnet_cidr: "{{ cc_subnet_prefix }}.0/24"
 
 cc_default_os_image: ubuntu-16.04-x86_64
 cc_default_flavor: c1.c1r1

@@ -2,6 +2,13 @@
 - name: Install dnsmasq
   apt: name=dnsmasq
 
+- name: Set fqdn in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^{{ ansible_default_ipv4.address }} "
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ cc_default_domain }} {{ inventory_hostname }}"
+
+
 - file: path=/etc/dnsmasq-hosts state=directory
 
 - name: Purge upstream resolvers
