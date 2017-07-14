@@ -1,12 +1,8 @@
-# Updates a host's network config so that dhclient no longer manages
-# domain name parts, updates resolv.conf to have our options
-# TODO move to common module, not really catalyst cloud material
-
-# - name: Set debian facts
-#   set_fact:
-#     ifname: "{{ cc_dhcp_interface | default('ens3') }}"
-#     pidfile: "/run/dhclient.{{ cc_dhcp_interface | default('ens3') }}.pid"
-#     leasefile: "/var/lib/dhcp/dhclient.{{ cc_dhcp_interface | default('ens3') }}.leases"
+- name: Set fqdn in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^{{ ansible_default_ipv4.address }} "
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ cc_default_domain }} {{ inventory_hostname }}"
 
 - include: roles/catalystcloud/tasks/set-internal-dns-debian.yml
   when: "common_osfamily == 'debian'"
@@ -14,10 +10,23 @@
 - include: roles/catalystcloud/tasks/set-internal-dns-redhat.yml
   when: "common_osfamily == 'redhat'"
 
-#- name: Set redhat facts
-#  set_fact:
-#    ifname: "{{ cc_dhcp_interface | default('eth0') }}"
-#    pidfile: "//var/run/dhclient-{{ ifname }}.pid"
-#  when: "common_osfamily == 'redhat'"
+- name: Update resolv.conf with static info
+  copy:
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      nameserver 127.0.0.1
+      {% for nameserver in nameservers | default(cc_default_nameservers) %}
+      nameserver {{ nameserver }}
+      {% endfor %}
+      search {{ cc_default_domain }}
 
-#- apt: name=dnsmasq
+- name: dnsmasq - local domain resolver
+  lineinfile:
+    path: /etc/dnsmasq.conf
+    line: "server=/{{ cc_default_domain }}/{{ cc_local_resolver }}"
+
+- name: Restart dnsmasq
+  service: name=dnsmasq state=restarted

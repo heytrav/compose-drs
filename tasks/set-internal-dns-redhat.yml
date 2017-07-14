@@ -9,14 +9,6 @@
     line: "request subnet-mask, broadcast-address, time-offset, routers, interface-mtu;"
     regexp: "^request "
 
-- name: Update resolv.conf
-  template:
-    src: roles/catalystcloud/templates/resolv.conf
-    dest: /etc/resolv.conf
-  vars:
-    domain: "{{ cc_default_domain }}"
-    nameservers: "{{ nameservers }}"
-
 - name: Launch dhclient (redhat)
   shell: >
            /sbin/dhclient -H {{ inventory_hostname }} -q

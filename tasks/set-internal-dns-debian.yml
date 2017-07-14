@@ -1,32 +1,5 @@
-- name: Set fqdn in /etc/hosts
-  lineinfile:
-    path: /etc/hosts
-    regexp: "^{{ ansible_default_ipv4.address }} "
-    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ cc_default_domain }} {{ inventory_hostname }}"
-
 - name: Install dnsmasq
   apt: name=dnsmasq
 
-- name: dnsmasq - local domain resolver
-  lineinfile:
-    path: /etc/dnsmasq.conf
-    line: "server=/{{ cc_default_domain }}/{{ cc_local_resolver }}"
-
-- name: Restart dnsmasq
-  service: name=dnsmasq state=restarted
-
 - name: Remove resolvconf
   apt: name=resolvconf state=absent
-
-- name: Update resolv.conf with static info
-  copy:
-    dest: /etc/resolv.conf
-    owner: root
-    group: root
-    mode: 0644
-    content: |
-      nameserver 127.0.0.1
-      {% for nameserver in nameservers | default(cc_default_nameservers) %}
-      nameserver {{ nameserver }}
-      {% endfor %}
-      search {{ cc_default_domain }}
