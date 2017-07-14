@@ -33,7 +33,13 @@
     content: "{{ vault_cc_powerdns_credentials }}"
   when: "vault_cc_powerdns_credentials is defined"
 
-# Todo install catalystcloud-powerdns somehow
+- copy:
+    src: roles/catalystcloud/files/catalystcloud-powerdns_20170703133146-git+4f4e6395_amd64.deb
+    dest: /tmp/catalystcloud-powerdns.deb
+
+- apt: name=ruby
+
+- apt: deb=/tmp/catalystcloud-powerdns.deb
 
 - name: DNS Update script
   copy:
@@ -50,14 +56,14 @@
       set -e
       # to etc hosts files
       /opt/catalystcloud-powerdns/populate-zone \
-        --dns-zone devcloud.cat-it.co.nz. \
-        --openstack-network pact-dev-internal \
+        --dns-zone {{ cc_dns_zone }} \
+        --openstack-network {{ cc_network_name }} \
         --local-hosts > /etc/dnsmasq-hosts/openstack-hosts
       {% if vault_cc_powerdns_credentials is defined %}
       # Corporate DNS update
       /opt/catalystcloud-powerdns/populate-zone \
-        --dns-zone devcloud.cat-it.co.nz. \
-        --openstack-network pact-dev-internal \
+        --dns-zone {{ cc_dns_zone }} \
+        --openstack-network {{ cc_network_name }} \
         --dns-api-creds /etc/catalystcloud-powerdns.creds
       {% endif %}
 
