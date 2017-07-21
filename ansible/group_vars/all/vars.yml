@@ -15,7 +15,7 @@ images:
     tag: latest
   api:
     image: quay.io/heytrav/domain-api
-    tag: 1.2.21
+    tag: provider-in-contacts
   nodepp:
     image: quay.io/heytrav/nodepp
     tag: 1.2.8
