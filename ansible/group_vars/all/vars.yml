@@ -8,8 +8,8 @@ rabbitmq_default_vhost: /
 
 images:
   rabbitmq:
-    image: quay.io/heytrav/rabbitmq
-    tag: latest
+    image: rabbitmq
+    tag: 3.6-management-alpine
   domaindb:
     image: mysql
     tag: latest
