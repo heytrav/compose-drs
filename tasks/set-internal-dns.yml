@@ -18,15 +18,29 @@
     mode: 0644
     content: |
       nameserver 127.0.0.1
+      search {{ cc_default_domain }}
+
+- name: Set upstream resolvers
+  copy:
+    dest: /etc/resolv.dnsmasq
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      nameserver {{ cc_local_resolver }}
       {% for nameserver in nameservers | default(cc_default_nameservers) %}
       nameserver {{ nameserver }}
       {% endfor %}
-      search {{ cc_default_domain }}
 
 - name: dnsmasq - local domain resolver
   lineinfile:
     path: /etc/dnsmasq.conf
     line: "server=/{{ cc_default_domain }}/{{ cc_local_resolver }}"
+
+- name: dnsmasq - set upstream resolvers
+  lineinfile:
+    path: /etc/dnsmasq.conf
+    line: "resolv-file=/etc/resolv.dnsmasq"
 
 - name: Restart dnsmasq
   service: name=dnsmasq state=restarted
