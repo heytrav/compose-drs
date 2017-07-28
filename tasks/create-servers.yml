@@ -38,7 +38,7 @@
                  lock_passwd: true
                  sudo: ALL=(ALL) NOPASSWD:ALL
                  ssh_authorized_keys:
-                   - "{{ cc_default_keypair_pubkey }}"
+                     - "{{ cc_default_keypair_pubkey }}"
                  {% for key in item.authorized_keys | default(cc_default_server_authorized_keys) %}
                    - "{{ key }}"
                  {% endfor %}

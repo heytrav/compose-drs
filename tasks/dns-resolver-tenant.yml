@@ -56,7 +56,7 @@
       set -e
       # to etc hosts files
       /opt/catalystcloud-powerdns/populate-zone \
-        --dns-zone {{ cc_dns_zone }} \
+        --dns-zone {{ cc_dns_zone }}. \
         --openstack-network {{ cc_network_name }} \
         --local-hosts > /etc/dnsmasq-hosts/openstack-hosts
       {% if vault_cc_powerdns_credentials is defined %}
