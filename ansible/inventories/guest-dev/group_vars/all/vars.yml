@@ -23,3 +23,84 @@ service_volumes:
   api:
     volumes:
       - ../drs-project:/usr/local/domain-api
+
+configs:
+  nginx:
+    file: site.conf
+  centralnic:
+    file: centralnic-epp.json
+    config:
+      host: epp-ote.centralnic.com
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+        - host
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        host:
+          xmlns: urn:ietf:params:xml:ns:host-1.0 
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+  cocca:
+    file: cocca-epp.json
+    config:
+      host: ote.coccaregistry.org
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+        - host
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        host:
+          xmlns: urn:ietf:params:xml:ns:host-1.0 
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+  nzrs:
+    file: nzrs-epp.json
+    config:
+      host: srstestepp.srs.net.nz
+      cert: /run/secrets/nzrs-epp.pem
+      key: /run/secrets/nzrs-epp.key
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1

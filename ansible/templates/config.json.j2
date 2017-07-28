@@ -1,5 +1,5 @@
 {
     "app-config": {
-        "{{ service.name }}": {{ service.config|tojson|safe }}
+        "{{ epp_config_name }}": {{ configs[epp_config_name]['config']|to_json|safe }}
     }
 }

@@ -315,90 +315,6 @@ docker_secrets:
   rabbitmq_erlang_cookie:
     external: true
 
-
-centralnic_config:
-  # nodepp config options
-  name: centralnic-test
-  config:
-    host: epp-ote.centralnic.com
-    port: 700
-    ssl: true
-    entities:
-      - domain
-      - contact
-      - host
-    extension:
-      - DNSSEC
-    extensionClasses:
-      - extension: DNSSEC
-        className: SecDnsExtension 
-    namespaces:
-      epp:
-        xmlns: urn:ietf:params:xml:ns:epp-1.0
-      domain:
-        xmlns: urn:ietf:params:xml:ns:domain-1.0
-      contact:
-        xmlns: urn:ietf:params:xml:ns:contact-1.0
-      host:
-        xmlns: urn:ietf:params:xml:ns:host-1.0 
-      DNSSEC:
-        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
-
-cocca_config:
-  # nodepp config options
-  name: cocca-test
-  config:
-    host: ote.coccaregistry.org
-    port: 700
-    ssl: true
-    entities:
-      - domain
-      - contact
-      - host
-    extension:
-      - DNSSEC
-    extensionClasses:
-      - extension: DNSSEC
-        className: SecDnsExtension 
-    namespaces:
-      epp:
-        xmlns: urn:ietf:params:xml:ns:epp-1.0
-      domain:
-        xmlns: urn:ietf:params:xml:ns:domain-1.0
-      contact:
-        xmlns: urn:ietf:params:xml:ns:contact-1.0
-      host:
-        xmlns: urn:ietf:params:xml:ns:host-1.0 
-      DNSSEC:
-        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
-
-nzrs_config:
-  name: nzrs-test
-  config:
-    host: srstestepp.srs.net.nz
-    cert: /run/secrets/nzrs-epp.pem
-    key: /run/secrets/nzrs-epp.key
-    port: 700
-    ssl: true
-    entities:
-      - domain
-      - contact
-    extension:
-      - DNSSEC
-    extensionClasses:
-      - extension: DNSSEC
-        className: SecDnsExtension 
-    namespaces:
-      epp:
-        xmlns: urn:ietf:params:xml:ns:epp-1.0
-      domain:
-        xmlns: urn:ietf:params:xml:ns:domain-1.0
-      contact:
-        xmlns: urn:ietf:params:xml:ns:contact-1.0
-      DNSSEC:
-        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
-
-
 nodepp_sentry_webhook_url: vault_nodepp_sentry_webhook_url
 api_sentry_webhook_url: vault_api_sentry_webhook_url
 celery_sentry_webhook_url: vault_celery_sentry_webhook_url
@@ -415,6 +331,7 @@ migrate_service:
       restart_policy:
           condition: on-failure
           max_attempts: 1
+
 rabbitmq_service:
   image: "{{ images.rabbitmq.image  }}:{{ images.rabbitmq.tag  }}"
   environment: "{{ rabbitmq_environment }}"

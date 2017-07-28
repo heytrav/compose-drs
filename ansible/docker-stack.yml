@@ -29,6 +29,26 @@
       set_fact:
         services: "{{services | combine(service_volumes, recursive=True)}}"
 
+    - name: Initialize list of known configs
+      set_fact:
+        known_configs: {}
+
+    - name: Generate EPP configs
+      include: ./epp-config.yml
+      vars:
+        epp_service_config: "{{ configs[item]  }}"
+        epp_config_name: "{{ item }}"
+        epp_service: "{{ services[item] }}"
+      when: item in services
+      with_items:
+        - nzrs
+        - cocca
+        - centralnic
+
+    - name: Generate nginx config
+      template:
+        src: templates/nginx.conf.j2
+        dest: "{{ base_directory  }}/{{ configs.nginx.file  }}"
 
     - name: Create docker compose spec
       notify:
