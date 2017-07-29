@@ -1,0 +1,57 @@
+# To be run exclusively for creating/updating docker configs
+# 
+# Because of the way docker config works (like docker secrets), we can't just
+# change the underlying configuration and expect the application to recognise
+# it, nor can we "docker config rm X &&  docker config create X" with an
+# updated X. Docker will complain that the config is still in use by a
+# service. Instead the idea is to create a config called myconfig-2,
+# create the docker stack file with that new version and run an
+# update. After the update, run "docker config rm myconfig-1".
+#
+# This requires setting a "version" number as part of the configuration. The
+# version number itself must not have any significance for the application; it
+# merely serves to tell docker config that there is a "new" configuration to
+# point to. It's probably also helpful to have it appear in the actual config
+# file so that ansible notices a change and notifies the handler.
+---
+- name: Docker stack configuration
+  hosts: manager
+  tasks:
+
+    - name: Initialize list of known configs
+      set_fact:
+        known_configs: []
+
+    - name: Register existing docker configs
+      command: docker config ls --format  "{{ '{{' }}.Name{{  '}}' }}"
+      register: existing_configs
+
+    - name: Generate EPP configs
+      include: ./epp-config.yml
+      vars:
+        epp_service_config: "{{ configs[item]  }}"
+        epp_config_name: "{{ item }}"
+      when: item in services
+      with_items: "{{ registries  }}"
+      notify:
+        - "create {{ item  }}"
+
+    - name: Generate nginx config
+      template:
+        src: templates/nginx.conf.j2
+        dest: "{{ base_directory  }}/{{ configs.nginx.file  }}"
+      notify:
+        - create nginx
+
+  handlers:
+    - name: create cocca
+      command:  docker config create 'cocca-{{ configs.cocca.version  }}' "{{ base_directory  }}/{{ configs.cocca.file  }}"
+
+    - name: create centralnic
+      command:  docker config create 'centralnic-{{ configs.centralnic.version  }}' "{{ base_directory  }}/{{ configs.centralnic.file  }}"
+
+    - name: create nzrs
+      command:  docker config create 'nzrs-{{ configs.nzrs.version  }}' "{{ base_directory  }}/{{ configs.nzrs.file  }}"
+
+    - name: create nginx
+      command:  docker config create 'nginx-{{ configs.nginx.version  }}' "{{ base_directory  }}/{{ configs.nginx.file  }}"

@@ -1,0 +1,16 @@
+
+# TODO Handle case where a service might have multiple configs. Currently only
+# handle case where a service has exactly 1 config.
+
+- name: Create temporary configs dict
+  set_fact:
+    service_configs: 
+      - "{{ config_version_name }}"
+
+- name: Put config in for "{{ service_config_name }}"
+  set_fact:
+    known_configs: "{{ known_configs + service_configs }}"
+
+- name: Add config name to service
+  set_fact:
+    services: "{{ services|combine({  service_config_name : {'configs': service_configs}}, recursive=True)  }}"

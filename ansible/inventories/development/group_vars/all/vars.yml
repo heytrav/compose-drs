@@ -31,8 +31,10 @@ service_volumes:
 configs:
   nginx:
     file: site.conf
+    version: 1
   centralnic:
     file: centralnic-epp.json
+    version: 1
     config:
       host: epp-ote.centralnic.com
       port: 700
@@ -59,6 +61,7 @@ configs:
           xmlns: urn:ietf:params:xml:ns:secDNS-1.1
   cocca:
     file: cocca-epp.json
+    version: 1
     config:
       host: ote.coccaregistry.org
       port: 700
@@ -85,6 +88,7 @@ configs:
           xmlns: urn:ietf:params:xml:ns:secDNS-1.1
   nzrs:
     file: nzrs-epp.json
+    version: 1
     config:
       host: srstestepp.srs.net.nz
       cert: /run/secrets/nzrs-epp.pem

@@ -7,7 +7,7 @@ services:
 
 configs:
 {% for name, config in known_configs.items() %}
-  {{ {name: {'file':   base_directory + '/' + config.file }} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False)  }}{% endfor %}
+  {{ {name: {'external': true }} | to_nice_yaml(width=50, explicit_start=False, explicit_end=False)  }}{% endfor %}
 
 secrets:
 {% for secret in known_secrets %}
