@@ -26,7 +26,7 @@
       command: docker config ls --format  "{{ '{{' }}.Name{{  '}}' }}"
       register: existing_configs
 
-    - name: Generate EPP configs
+    - name: Generate nodepp json config files
       include: ./epp-config.yml
       vars:
         epp_service_config: "{{ configs[item]  }}"
@@ -36,7 +36,7 @@
       notify:
         - "create {{ item  }}"
 
-    - name: Generate nginx config
+    - name: Generate nginx site.conf config file
       template:
         src: templates/nginx.conf.j2
         dest: "{{ base_directory  }}/{{ configs.nginx.file  }}"
