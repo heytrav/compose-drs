@@ -31,15 +31,20 @@
 
     - name: Initialize list of known configs
       set_fact:
-        known_configs: {}
+        known_configs: []
 
-    - name: Load in configuration for stack file
+    - name: Load known configs for stack
       include: ./load-drs-configs.yml
       vars:
         epp_service_config: "{{ item.value  }}"
-        epp_config_name: "{{ item.key }}"
+        service_config_name: "{{ item.key }}"
+        config_version_name: "{{ item.key  }}-{{ item.value.version  }}"
       when: "item.key in services"
       with_dict: "{{ configs  }}"
+
+    - name: Debug services
+      debug:
+        msg: "Services: {{ services  }}  "
 
     - name: Create docker compose spec
       notify:
@@ -55,7 +60,8 @@
 
   handlers:
     - name: deploy stack
-      shell: bash -lc "cd  {{ base_directory  }} && docker stack deploy -c drs-stack.yml domainapi"
+      command: docker stack deploy -c  "{{ base_directory  }}/drs-stack.yml" domainapi
+
     - name: nodepp version
       when: nodepp_sentry_webhook_url is defined
       become: no
