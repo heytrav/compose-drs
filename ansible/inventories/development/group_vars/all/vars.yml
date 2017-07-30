@@ -30,12 +30,12 @@ service_volumes:
 
 configs:
   nginx:
-    - name: site.conf
-      source: site.conf
-      target: /etc/nginx/conf.d/site.conf
+    - name: nginx
       version: 1
+      compose:
+        target: /etc/nginx/conf.d/site.conf
   centralnic:
-    - name: centralnic-epp.json
+    - name: centralnic-epp
       version: 1
       config:
         host: epp-ote.centralnic.com
@@ -62,7 +62,7 @@ configs:
           DNSSEC:
             xmlns: urn:ietf:params:xml:ns:secDNS-1.1
   cocca:
-    - name: cocca-epp.json
+    - name: cocca-epp
       version: 1
       config:
         host: ote.coccaregistry.org
@@ -89,7 +89,7 @@ configs:
           DNSSEC:
             xmlns: urn:ietf:params:xml:ns:secDNS-1.1
   nzrs:
-    - name: nzrs-epp.json
+    - name: nzrs-epp
       version: 1
       config:
         host: srstestepp.srs.net.nz
