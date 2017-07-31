@@ -5,6 +5,10 @@ rabbitmq_host: rabbitmq
 rabbitmq_port: 5672
 rabbitmq_default_vhost: /
 
+registries:
+  - nzrs
+  - cocca
+  - centralnic
 
 images:
   rabbitmq:
@@ -26,9 +30,9 @@ images:
     image: memcached
     tag: latest
 
-cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca", "--loglevel", "debug"]
 cocca_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3
@@ -62,9 +66,9 @@ cocca_deploy:
     delay: 5s
     failure_action: pause
 
-centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic", "--loglevel", "debug"]
 centralnic_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3
@@ -98,9 +102,9 @@ centralnic_deploy:
       delay: 5s
       failure_action: pause
 
-nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
+nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs", "--loglevel", "debug"]
 nzrs_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3
@@ -315,90 +319,6 @@ docker_secrets:
   rabbitmq_erlang_cookie:
     external: true
 
-
-centralnic_config:
-  # nodepp config options
-  name: centralnic-test
-  config:
-    host: epp-ote.centralnic.com
-    port: 700
-    ssl: true
-    entities:
-      - domain
-      - contact
-      - host
-    extension:
-      - DNSSEC
-    extensionClasses:
-      - extension: DNSSEC
-        className: SecDnsExtension 
-    namespaces:
-      epp:
-        xmlns: urn:ietf:params:xml:ns:epp-1.0
-      domain:
-        xmlns: urn:ietf:params:xml:ns:domain-1.0
-      contact:
-        xmlns: urn:ietf:params:xml:ns:contact-1.0
-      host:
-        xmlns: urn:ietf:params:xml:ns:host-1.0 
-      DNSSEC:
-        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
-
-cocca_config:
-  # nodepp config options
-  name: cocca-test
-  config:
-    host: ote.coccaregistry.org
-    port: 700
-    ssl: true
-    entities:
-      - domain
-      - contact
-      - host
-    extension:
-      - DNSSEC
-    extensionClasses:
-      - extension: DNSSEC
-        className: SecDnsExtension 
-    namespaces:
-      epp:
-        xmlns: urn:ietf:params:xml:ns:epp-1.0
-      domain:
-        xmlns: urn:ietf:params:xml:ns:domain-1.0
-      contact:
-        xmlns: urn:ietf:params:xml:ns:contact-1.0
-      host:
-        xmlns: urn:ietf:params:xml:ns:host-1.0 
-      DNSSEC:
-        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
-
-nzrs_config:
-  name: nzrs-test
-  config:
-    host: srstestepp.srs.net.nz
-    cert: /run/secrets/nzrs-epp.pem
-    key: /run/secrets/nzrs-epp.key
-    port: 700
-    ssl: true
-    entities:
-      - domain
-      - contact
-    extension:
-      - DNSSEC
-    extensionClasses:
-      - extension: DNSSEC
-        className: SecDnsExtension 
-    namespaces:
-      epp:
-        xmlns: urn:ietf:params:xml:ns:epp-1.0
-      domain:
-        xmlns: urn:ietf:params:xml:ns:domain-1.0
-      contact:
-        xmlns: urn:ietf:params:xml:ns:contact-1.0
-      DNSSEC:
-        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
-
-
 nodepp_sentry_webhook_url: vault_nodepp_sentry_webhook_url
 api_sentry_webhook_url: vault_api_sentry_webhook_url
 celery_sentry_webhook_url: vault_celery_sentry_webhook_url
@@ -415,6 +335,7 @@ migrate_service:
       restart_policy:
           condition: on-failure
           max_attempts: 1
+
 rabbitmq_service:
   image: "{{ images.rabbitmq.image  }}:{{ images.rabbitmq.tag  }}"
   environment: "{{ rabbitmq_environment }}"
@@ -484,3 +405,105 @@ nzrs_service:
   environment: "{{ nzrs_environment }}"
   healthcheck: "{{ nzrs_healthcheck }}"
   secrets: "{{ nzrs_secrets }}"
+
+
+configs:
+  nginx:
+    file: site.conf
+    services:
+      - nginx
+    version: 1
+    compose:
+      target: /etc/nginx/conf.d/site.conf
+  centralnic:
+    services: 
+      - centralnic
+    file: centralnic-epp.json
+    compose:
+      target: /centralnic-epp.json
+    version: 1
+    config:
+      host: epp-ote.centralnic.com
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+        - host
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        host:
+          xmlns: urn:ietf:params:xml:ns:host-1.0 
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+  cocca:
+    services:
+      - cocca
+    file: cocca-epp.json
+    version: 1
+    compose:
+      target: /cocca-epp.json
+    config:
+      host: ote.coccaregistry.org
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+        - host
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        host:
+          xmlns: urn:ietf:params:xml:ns:host-1.0 
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+  nzrs:
+    services:
+      - nzrs
+    file: nzrs-epp.json
+    compose:
+      target: /nzrs-epp.json
+    version: 1
+    config:
+      host: srstestepp.srs.net.nz
+      cert: /run/secrets/nzrs-epp.pem
+      key: /run/secrets/nzrs-epp.key
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1

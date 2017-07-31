@@ -1,0 +1,22 @@
+---
+
+- name: Set up default service config list
+  set_fact:
+    config_list: []
+
+- name: Get config list for service
+  set_fact:
+    config_list: "{{ configs[config_item]['configs'] }}"
+  when: "'configs' in configs[config_item]"
+
+- name: Append config to config list
+  set_fact:
+    config_list: "{{ config_list +  [compose_config] }}"
+
+- name: Re add config list to service
+  set_fact:
+    services: "{{ services|combine({config_item: {'configs': config_list}}, recursive=True) }}"
+
+- name: Add source to list of configs
+  set_fact:
+    known_configs: "{{ known_configs + [source] }}"

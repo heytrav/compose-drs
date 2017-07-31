@@ -12,7 +12,7 @@ services:
   celery: "{{ celery_service  }}"
   api: "{{ api_service  }}"
   cocca: "{{ cocca_service  }}"
-  centralnic: "{{ centralnic_service  }}"
+  centralnic: "{{ centralnic_service }}"
 
 service_volumes:
   cocca:
@@ -27,3 +27,4 @@ service_volumes:
   api:
     volumes:
       - ../drs-project:/usr/local/domain-api
+

@@ -1,0 +1,25 @@
+# To be run exclusively for creating/updating docker configs
+---
+- name: Clean-up unused docker configs
+  hosts: manager
+  tasks:
+
+    - name: Register existing docker configs
+      command: docker config ls --format  "{{ '{{' }}.Name{{  '}}' }}"
+      register: existing_configs
+
+    - name: Initialize list of known configs
+      set_fact:
+        known_configs: []
+
+    - name: Load known configs for stack
+      include: ./load-drs-configs.yml
+      vars:
+        service_config: "{{ item.value  }}"
+        service_name: "{{ item.key }}"
+      with_dict: "{{ configs  }}"
+
+    - name: Remove unused configs
+      with_items: "{{ existing_configs.stdout_lines }}" 
+      command: docker config rm "{{ item }}"
+      when: item not in known_configs
