@@ -40,6 +40,8 @@ configs:
     services: 
       - centralnic
     file: centralnic-epp.json
+    compose:
+      target: /centralnic-epp.json
     version: 1
     config:
       host: epp-ote.centralnic.com
@@ -70,6 +72,8 @@ configs:
       - cocca
     file: cocca-epp.json
     version: 1
+    compose:
+      target: /cocca-epp.json
     config:
       host: ote.coccaregistry.org
       port: 700
@@ -98,6 +102,8 @@ configs:
     services:
       - nzrs
     file: nzrs-epp.json
+    compose:
+      target: /nzrs-epp.json
     version: 1
     config:
       host: srstestepp.srs.net.nz

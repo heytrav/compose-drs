@@ -2,3 +2,5 @@
 *.retry
 .stack_env
 drs-stack.yml
+*-epp.json
+site.conf
