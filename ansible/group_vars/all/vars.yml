@@ -30,9 +30,9 @@ images:
     image: memcached
     tag: latest
 
-cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/cocca-1", "-r", "cocca", "--loglevel", "debug"]
 cocca_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/cocca_test_config", "-r", "cocca-test", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/cocca-1", "-r", "cocca", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3
@@ -66,9 +66,9 @@ cocca_deploy:
     delay: 5s
     failure_action: pause
 
-centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/centralnic-1", "-r", "centralnic", "--loglevel", "debug"]
 centralnic_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/centralnic_test_config", "-r", "centralnic-test", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/centralnic-1", "-r", "centralnic", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3
@@ -102,9 +102,9 @@ centralnic_deploy:
       delay: 5s
       failure_action: pause
 
-nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
+nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-1", "-r", "nzrs", "--loglevel", "debug"]
 nzrs_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/run/secrets/nzrs_test_config", "-r", "nzrs-test", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/nzrs-1", "-r", "nzrs", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3

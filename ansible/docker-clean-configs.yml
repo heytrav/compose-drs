@@ -15,10 +15,8 @@
     - name: Load known configs for stack
       include: ./load-drs-configs.yml
       vars:
-        epp_service_config: "{{ item.value  }}"
-        service_config_name: "{{ item.key }}"
-        config_version_name: "{{ item.key  }}-{{ item.value.version  }}"
-      when: "item.key in services"
+        service_config: "{{ item.value  }}"
+        service_name: "{{ item.key }}"
       with_dict: "{{ configs  }}"
 
     - name: Remove unused configs

@@ -32,9 +32,7 @@
         epp_service_config: "{{ configs[item]  }}"
         epp_config_name: "{{ item }}"
       when: item in services
-      with_items: "{{ registries  }}"
-      notify:
-        - "create {{ item  }}"
+      with_items: "{{ registries }}"
 
     - name: Generate nginx site.conf config file
       template:

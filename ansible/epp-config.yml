@@ -2,5 +2,5 @@
   template:
     src: templates/config.json.j2
     dest: "{{ base_directory }}/{{ epp_service_config.file }}"
-  when: epp_config_name in configs
   notify: "create {{ epp_config_name }}"
+

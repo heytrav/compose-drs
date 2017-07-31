@@ -30,87 +30,95 @@ service_volumes:
 
 configs:
   nginx:
-    - name: nginx
-      version: 1
-      compose:
-        target: /etc/nginx/conf.d/site.conf
+    file: site.conf
+    services:
+      - nginx
+    version: 1
+    compose:
+      target: /etc/nginx/conf.d/site.conf
   centralnic:
-    - name: centralnic-epp
-      version: 1
-      config:
-        host: epp-ote.centralnic.com
-        port: 700
-        ssl: true
-        entities:
-          - domain
-          - contact
-          - host
-        extension:
-          - DNSSEC
-        extensionClasses:
-          - extension: DNSSEC
-            className: SecDnsExtension 
-        namespaces:
-          epp:
-            xmlns: urn:ietf:params:xml:ns:epp-1.0
-          domain:
-            xmlns: urn:ietf:params:xml:ns:domain-1.0
-          contact:
-            xmlns: urn:ietf:params:xml:ns:contact-1.0
-          host:
-            xmlns: urn:ietf:params:xml:ns:host-1.0 
-          DNSSEC:
-            xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+    services: 
+      - centralnic
+    file: centralnic-epp.json
+    version: 1
+    config:
+      host: epp-ote.centralnic.com
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+        - host
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        host:
+          xmlns: urn:ietf:params:xml:ns:host-1.0 
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
   cocca:
-    - name: cocca-epp
-      version: 1
-      config:
-        host: ote.coccaregistry.org
-        port: 700
-        ssl: true
-        entities:
-          - domain
-          - contact
-          - host
-        extension:
-          - DNSSEC
-        extensionClasses:
-          - extension: DNSSEC
-            className: SecDnsExtension 
-        namespaces:
-          epp:
-            xmlns: urn:ietf:params:xml:ns:epp-1.0
-          domain:
-            xmlns: urn:ietf:params:xml:ns:domain-1.0
-          contact:
-            xmlns: urn:ietf:params:xml:ns:contact-1.0
-          host:
-            xmlns: urn:ietf:params:xml:ns:host-1.0 
-          DNSSEC:
-            xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+    services:
+      - cocca
+    file: cocca-epp.json
+    version: 1
+    config:
+      host: ote.coccaregistry.org
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+        - host
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        host:
+          xmlns: urn:ietf:params:xml:ns:host-1.0 
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
   nzrs:
-    - name: nzrs-epp
-      version: 1
-      config:
-        host: srstestepp.srs.net.nz
-        cert: /run/secrets/nzrs-epp.pem
-        key: /run/secrets/nzrs-epp.key
-        port: 700
-        ssl: true
-        entities:
-          - domain
-          - contact
-        extension:
-          - DNSSEC
-        extensionClasses:
-          - extension: DNSSEC
-            className: SecDnsExtension 
-        namespaces:
-          epp:
-            xmlns: urn:ietf:params:xml:ns:epp-1.0
-          domain:
-            xmlns: urn:ietf:params:xml:ns:domain-1.0
-          contact:
-            xmlns: urn:ietf:params:xml:ns:contact-1.0
-          DNSSEC:
-            xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+    services:
+      - nzrs
+    file: nzrs-epp.json
+    version: 1
+    config:
+      host: srstestepp.srs.net.nz
+      cert: /run/secrets/nzrs-epp.pem
+      key: /run/secrets/nzrs-epp.key
+      port: 700
+      ssl: true
+      entities:
+        - domain
+        - contact
+      extension:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1

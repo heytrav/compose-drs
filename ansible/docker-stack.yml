@@ -36,9 +36,8 @@
     - name: Load known configs for stack
       include: ./load-drs-configs.yml
       vars:
-        epp_service_configs: "{{ item.value  }}"
+        service_config: "{{ item.value  }}"
         service_name: "{{ item.key }}"
-      when: "item.key in services"
       with_dict: "{{ configs }}"
 
     - name: Create docker compose spec

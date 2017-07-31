@@ -1,23 +1,21 @@
-
-# TODO Handle case where a service might have multiple configs. Currently only
-# handle case where a service has exactly 1 config.
-- name: Set up service config set
+- name: Set name for source of config
   set_fact:
-    service_configs: []
+    source: "{{ service_name }}-{{ service_config.version }}"
 
-- name: Process compose config
-  include: ./load-compose-config.yml
+- name: Create compose config
+  set_fact:
+    compose_config: 
+      source: "{{ source }}"
+
+- name: Create compose config
+  set_fact:
+    compose_config: "{{ compose_config | combine(service_config.compose, recursive=True ) }}"
+  when: "'compose' in service_config"
+
+- name: Add service config to existing services
+  with_items: "{{ service_config.services }}"
   loop_control:
     loop_var: config_item
-  vars:
-    config: "{{ config_item  }}"
-  with_items: "{{ epp_service_configs  }}"
+  include: ./append-compose-config.yml
+  when: config_item in services
 
-- name: Create configs attribute for compose
-  set_fact:
-    compose_config:
-      configs: "{{ service_configs  }}"
-
-- name: Add config for "{{ service_name }}"
-  set_fact:
-    services: "{{ services|combine({service_name: compose_config}, recursive=True) }}"
