@@ -24,8 +24,8 @@ images:
     image: quay.io/heytrav/nodepp
     tag: 1.2.8
   nginx:
-    image: quay.io/heytrav/drs-nginx
-    tag: 0.1.0
+    image: nginx
+    tag: stable-alpine
   memcached:
     image: memcached
     tag: latest
@@ -247,7 +247,6 @@ api_deploy:
 nginx_secrets:
   - site.key
   - site.crt
-nginx_command: ["nginx"]
 nginx_ports: 
   - 443:443
 nginx_deploy:
