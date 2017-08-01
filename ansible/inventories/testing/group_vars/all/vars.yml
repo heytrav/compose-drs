@@ -19,3 +19,31 @@ service_volumes:
   domaindb:
     volumes:
       - /var/lib/mysql:/var/lib/mysql
+
+cocca_deploy:
+  replicas: 2
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+centralnic_deploy:
+  replicas: 2
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+nzrs_deploy:
+  replicas: 2
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause

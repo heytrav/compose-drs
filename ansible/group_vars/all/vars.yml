@@ -93,14 +93,14 @@ centralnic_secrets:
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
 centralnic_deploy:
-    replicas: 1
-    restart_policy:
-      condition: on-failure
-      delay: 10s
-    update_config:
-      parallelism: 1
-      delay: 5s
-      failure_action: pause
+  replicas: 1
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
 
 nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs-test", "--loglevel", "debug"]
 nzrs_healthcheck: 
