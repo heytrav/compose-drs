@@ -1,6 +1,6 @@
 {
     "app-config": {
-        "{{ epp_config_name }}": {{ epp_service_config['config']|to_json|safe }}
+        "{{ epp_service_config['name'] }}": {{ epp_service_config['config']|to_json|safe }}
     },
     "version": "{{ epp_service_config['version'] }}"
 }

@@ -30,9 +30,9 @@ images:
     image: memcached
     tag: latest
 
-cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca", "--loglevel", "debug"]
+cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca-test", "--loglevel", "debug"]
 cocca_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca-test", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3
@@ -66,9 +66,9 @@ cocca_deploy:
     delay: 5s
     failure_action: pause
 
-centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic", "--loglevel", "debug"]
+centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic-test", "--loglevel", "debug"]
 centralnic_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic-test", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3
@@ -102,9 +102,9 @@ centralnic_deploy:
       delay: 5s
       failure_action: pause
 
-nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs", "--loglevel", "debug"]
+nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs-test", "--loglevel", "debug"]
 nzrs_healthcheck: 
-  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs", "--loglevel", "debug"]
+  test: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs-test", "--loglevel", "debug"]
   interval: 1m
   timeout: 20s
   retries: 3
@@ -145,6 +145,7 @@ rabbitmq_environment:
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+  RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 0.49
   RABBITMQ_HOST: "{{ rabbitmq_host  }}"
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
   RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
@@ -341,6 +342,10 @@ rabbitmq_service:
   secrets: "{{ rabbitmq_secrets }}"
   ports:
   - 15672:15672
+  deploy:
+    resources:
+      limits:
+        memory: 2048M
 celery_service:
   image: "{{ images.api.image  }}:{{ images.api.tag  }}"
   command: "{{celery_command}}"
@@ -414,21 +419,22 @@ configs:
     compose:
       target: /etc/nginx/conf.d/site.conf
   centralnic:
+    name: centralnic-test
     services: 
       - centralnic
     file: centralnic-epp.json
     compose:
       target: /centralnic-epp.json
-    version: 1
+    version: 4
     config:
       host: epp-ote.centralnic.com
       port: 700
       ssl: true
-      entities:
+      services:
         - domain
         - contact
         - host
-      extension:
+      extensions:
         - DNSSEC
       extensionClasses:
         - extension: DNSSEC
@@ -445,21 +451,22 @@ configs:
         DNSSEC:
           xmlns: urn:ietf:params:xml:ns:secDNS-1.1
   cocca:
+    name: cocca-test
     services:
       - cocca
     file: cocca-epp.json
-    version: 1
+    version: 4
     compose:
       target: /cocca-epp.json
     config:
       host: ote.coccaregistry.org
       port: 700
       ssl: true
-      entities:
+      services:
         - domain
         - contact
         - host
-      extension:
+      extensions:
         - DNSSEC
       extensionClasses:
         - extension: DNSSEC
@@ -476,22 +483,23 @@ configs:
         DNSSEC:
           xmlns: urn:ietf:params:xml:ns:secDNS-1.1
   nzrs:
+    name: nzrs-test
     services:
       - nzrs
     file: nzrs-epp.json
     compose:
       target: /nzrs-epp.json
-    version: 1
+    version: 4
     config:
       host: srstestepp.srs.net.nz
       cert: /run/secrets/nzrs-epp.pem
       key: /run/secrets/nzrs-epp.key
       port: 700
       ssl: true
-      entities:
+      services:
         - domain
         - contact
-      extension:
+      extensions:
         - DNSSEC
       extensionClasses:
         - extension: DNSSEC
