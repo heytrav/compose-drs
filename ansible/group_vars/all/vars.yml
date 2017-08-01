@@ -56,15 +56,6 @@ cocca_secrets:
   - rabbitmq_default_user
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
-cocca_deploy:
-  replicas: 1
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause
 
 centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic-test", "--loglevel", "debug"]
 centralnic_healthcheck: 
@@ -92,15 +83,6 @@ centralnic_secrets:
   - rabbitmq_default_user
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
-centralnic_deploy:
-  replicas: 1
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause
 
 nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs-test", "--loglevel", "debug"]
 nzrs_healthcheck: 
@@ -130,16 +112,6 @@ nzrs_secrets:
   - rabbitmq_default_user
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
-nzrs_deploy:
-  replicas: 2
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause
-
 
 rabbitmq_environment:
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user

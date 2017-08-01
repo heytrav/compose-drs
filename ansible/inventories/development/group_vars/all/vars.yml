@@ -28,3 +28,31 @@ service_volumes:
     volumes:
       - ../drs-project:/usr/local/domain-api
 
+cocca_deploy:
+  replicas: 1
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+centralnic_deploy:
+  replicas: 1
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+nzrs_deploy:
+  replicas: 1
+  restart_policy:
+    condition: on-failure
+    delay: 10s
+  update_config:
+    parallelism: 1
+    delay: 5s
+    failure_action: pause
+
