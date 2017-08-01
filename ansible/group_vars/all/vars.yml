@@ -28,7 +28,7 @@ images:
     tag: stable-alpine
   memcached:
     image: memcached
-    tag: latest
+    tag: alpine
 
 cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca-test", "--loglevel", "debug"]
 cocca_healthcheck: 
