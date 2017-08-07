@@ -11,6 +11,15 @@
 
 - file: path=/etc/dnsmasq-hosts state=directory
 
+- name: Read local hosts files
+  copy:
+    dest: /etc/dnsmasq.d/local-hosts
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+               hostsdir=/etc/dnsmasq-hosts
+
 - name: Purge upstream resolvers
   lineinfile:
     path: /etc/dnsmasq.conf
@@ -22,7 +31,22 @@
     path: /etc/dnsmasq.conf
     line: "server=/{{ item.domain }}/{{ item.resolver }}"
   with_items: "{{ cc_local_resolver_upstreams }}"
-  tags: debug
+
+- name: Set default resolvers
+  copy:
+    dest: /etc/resolv.dnsmasq
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      {% for nameserver in nameservers | default(cc_default_nameservers) %}
+      nameserver {{ nameserver }}
+      {% endfor %}
+
+- name: dnsmasq - set upstream resolvers
+  lineinfile:
+    path: /etc/dnsmasq.conf
+    line: "resolv-file=/etc/resolv.dnsmasq"
 
 - name: DNS API user/pass
   copy:

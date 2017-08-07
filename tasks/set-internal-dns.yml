@@ -28,9 +28,6 @@
     mode: 0644
     content: |
       nameserver {{ cc_local_resolver }}
-      {% for nameserver in nameservers | default(cc_default_nameservers) %}
-      nameserver {{ nameserver }}
-      {% endfor %}
 
 - name: dnsmasq - local domain resolver
   lineinfile:

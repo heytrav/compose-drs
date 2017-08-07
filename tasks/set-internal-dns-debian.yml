@@ -3,3 +3,7 @@
 
 - name: Remove resolvconf
   apt: name=resolvconf state=absent
+
+- template:
+    src: templates/dhclient-debian.conf
+    dest: /etc/dhcp/dhclient.conf
