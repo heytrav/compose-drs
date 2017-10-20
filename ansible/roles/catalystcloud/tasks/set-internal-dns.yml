@@ -1,0 +1,43 @@
+- name: Set fqdn in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^{{ ansible_default_ipv4.address }} "
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ cc_default_domain }} {{ inventory_hostname }}"
+
+- include: roles/catalystcloud/tasks/set-internal-dns-debian.yml
+  when: "common_osfamily == 'debian'"
+
+- include: roles/catalystcloud/tasks/set-internal-dns-redhat.yml
+  when: "common_osfamily == 'redhat'"
+
+- name: Update resolv.conf with static info
+  copy:
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      nameserver 127.0.0.1
+      search {{ cc_default_domain }}
+
+- name: Set upstream resolvers
+  copy:
+    dest: /etc/resolv.dnsmasq
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      nameserver {{ cc_local_resolver }}
+
+- name: dnsmasq - local domain resolver
+  lineinfile:
+    path: /etc/dnsmasq.conf
+    line: "server=/{{ cc_default_domain }}/{{ cc_local_resolver }}"
+
+- name: dnsmasq - set upstream resolvers
+  lineinfile:
+    path: /etc/dnsmasq.conf
+    line: "resolv-file=/etc/resolv.dnsmasq"
+
+- name: Restart dnsmasq
+  service: name=dnsmasq state=restarted

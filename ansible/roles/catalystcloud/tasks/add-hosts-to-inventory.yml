@@ -1,0 +1,44 @@
+- name: Add hosts on VPNised network to inventory
+  add_host:
+    name: "{{ item.name }}"
+    ansible_nodename: "{{ item.name }}"
+    ansible_ssh_host: "{{ item.ip }}"
+    ansible_ssh_user: "{{ cc_ssh_user }}"
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no "
+    groups: "{{ item.groups | default([]) }}"
+    common_osfamily: "{{ item.osfamily | default(omit) }}"
+  with_items: "{{ cc_servers }}"
+  when: 'cc_access_via_vpn'
+  vars:
+    groups_query: "[?name=='{{ item.name }}'].groups | []"
+  changed_when: false
+
+- name: Add hosts with floating ips to inventory
+  add_host:
+    name: "{{ item.name }}"
+    ansible_nodename: "{{ item.name }}"
+    ansible_ssh_host: "{{ item.ip }}"
+    ansible_ssh_user: "{{ cc_ssh_user }}"
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+    groups: "{{ cc_servers | json_query(groups_query)  }}"
+    common_osfamily: "{{ item.osfamily | default(omit) }}"
+  with_items: "{{ cc_floating_ips }}"
+  vars:
+    groups_query: "[?name=='{{ item.name }}'].groups | []"
+  changed_when: false
+
+- name: Add hosts behind floating ip to inventory
+  add_host:
+    name: "{{ item.name }}"
+    ansible_nodename: "{{ item.name }}"
+    ansible_ssh_host: "{{ item.ip }}"
+    ansible_ssh_user: "{{ cc_ssh_user }}"
+    ansible_ssh_common_args: "-o ProxyCommand='ssh -o StrictHostKeyChecking=no -W %h:%p -q {{ cc_ssh_user }}@{{ cc_jump_host }}'"
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no "
+    groups: "{{ item.groups | default([]) }}"
+    common_osfamily: "{{ item.osfamily | default(omit) }}"
+  with_items: "{{ cc_servers }}"
+  when: 'cc_jump_host is defined and (item.name not in hostvars)'
+  vars:
+    groups_query: "[?name=='{{ item.name }}'].groups | []"
+  changed_when: false

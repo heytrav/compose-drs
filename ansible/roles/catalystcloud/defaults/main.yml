@@ -1,0 +1,111 @@
+#
+# Required variables:
+#
+
+# name of network that hosts are attached to
+# cc_network_name: private-net
+# name of a keypair to load up in each host
+# cc_default_keypair_name: some-user-at-some-host
+#
+# cc_subnet_prefix: 192.168.2
+# cc_environment: prod/test
+
+#
+#  Main top level things
+#
+cc_ssh_user: ubuntu
+
+# the prefix can be used to discriminate between hosts and other openstack
+# resources where a tenant might be shared
+cc_prefix:
+
+cc_auth_url: https://api.cloud.catalyst.net.nz:5000/v2.0
+cc_auth_credentials_group: openstack
+# These need to be set if you want to use tasks/create-rc-file.yml
+# cc_tenant_name
+# cc_openstack_username
+# cc_openstack_password
+# cc_region
+
+cc_default_domain: "openstacklocal"
+cc_default_nameservers: [202.78.247.197, 202.78.247.198, 202.78.247.199]
+
+# when using the dns-resolver-tenant task, you can add upstream resolvers for
+# various bits of private dns
+cc_local_resolver_upstreams: []
+# for example
+#  - {domain: 'wgtn.cat-it.co.nz', resolver: '192.168.8.140'}
+
+cc_default_keypair_name: "{{ ansible_env['USER']  }}-at-{{ ansible_nodename }}"
+cc_default_keypair_file: "{{ ansible_env['HOME'] }}/.ssh/id_rsa.pub"
+cc_default_keypair_pubkey: "{{ lookup('file', cc_default_keypair_file) }}"
+cc_default_server_authorized_keys:
+  - "{{ cc_default_keypair_pubkey }}"
+
+cc_default_server_fs_type: ext4
+
+cc_router_name: router
+cc_public_net_name: public-net
+
+cc_subnet_name: "{{ cc_network_name }}"
+cc_subnet_dhcp_start: "{{ cc_subnet_prefix }}.150"
+cc_subnet_dhcp_end: "{{ cc_subnet_prefix }}.200"
+cc_subnet_cidr: "{{ cc_subnet_prefix }}.0/24"
+
+cc_default_os_image: ubuntu-16.04-x86_64
+cc_default_flavor: c1.c1r1
+
+# this is not very controlled in openstack
+# vdb is just the first one that is assigned
+# after the OS disk
+cc_volume_device_name: /dev/vdb
+cc_volume_group_name: data
+
+# array of hashes containing security group info
+cc_security_groups: []
+# as many of these as you like
+#  - group: "{{ cc_prefix }}name-of-the-group"
+# tcp/udp/icmp
+#    protocol: tcp
+# port to allow
+#    port: 22
+# optional - defaults to port val
+#    port_end: 24
+# optional - name of another security group
+#    remote_group: some-other-group #
+# optional - remote ip prefix in CIDR notation
+#    remote_ip_prefix: 192.168.0.1/24
+
+# defaults to all the names in cc_security_groups
+cc_security_group_names: "{{ cc_security_groups | map(attribute='group') | unique | list }}"
+
+
+# array of hashes containing server details
+cc_servers: []
+#  - name: "{{ cc_prefix }foo-server1"
+#  - security_groups: ["{{ cc_prefix }}some-security-group"]
+#  - ip: 192.168.2.3
+# size of a volume to create and attach to this instance
+#  - volume_size_mb: 1000
+# see cc_default_os_image
+#  - os_image:#
+# see cc_default_keypair_name
+#  - keypair_name: some-keypair-nam
+# defaults to cc_default_flavor
+#  - flavor:
+# Group names to assign to the server as openstack instance metadata
+#  - groups: #
+
+
+# hash containing a list of maps with name and ip, .e.g.
+# - {name: foo-server, ip: 8.8.8.8 }
+# (get one with `openstack floating ip create public-net`)
+cc_floating_ips: []
+#
+#
+# if true, assume hosts can be reached on their primary fixed ip
+cc_access_via_vpn: false
+
+
+# if specified, access to hosts without a floating ip is set up via this jump host
+# cc_jump_host:

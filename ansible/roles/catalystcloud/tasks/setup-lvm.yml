@@ -1,0 +1,31 @@
+- name: Assign openstack device to services group
+  lvg:
+    vg: "{{ cc_volume_group_name }}"
+    pvs: "{{ cc_volume_device_name }}"
+
+- name: Create volumes
+  lvol:
+    vg: "{{ cc_volume_group_name }}"
+    lv: "{{ item.name }}"
+    size: "{{ item.size }}"
+  with_items: "{{ cc_servers | json_query(query) }}"
+  vars:
+    query: "[?name=='{{ ansible_nodename | default(inventory_hostname) }}'] | [0].mounts"
+
+- name: Format volumes
+  filesystem:
+    dev: "/dev/{{ cc_volume_group_name }}/{{ item.name }}"
+    fstype: "{{ item.fstype | default(cc_default_server_fs_type) }}"
+  with_items: "{{ cc_servers | json_query(query) }}"
+  vars:
+    query: "[?name=='{{ ansible_nodename  | default(inventory_hostname) }}'] | [0].mounts"
+
+- name: Mount volumes
+  mount:
+    name: "{{ item.path }}"
+    fstype: "{{ item.fstype | default(cc_default_server_fs_type) }}"
+    state: mounted
+    src: "/dev/{{ cc_volume_group_name }}/{{ item.name }}"
+  with_items: "{{ cc_servers | json_query(query) }}"
+  vars:
+    query: "[?name=='{{ ansible_nodename | default(inventory_hostname) }}'] | [0].mounts"

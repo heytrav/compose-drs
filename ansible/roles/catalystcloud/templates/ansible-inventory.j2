@@ -1,0 +1,22 @@
+[{{ cc_environment }}]
+{% for server in cc_servers %}
+{% if ansible_runner is defined and ansible_runner == server.name %}
+{{ server.name }} ansible_connection=local ansible_nodename={{ server.name }}
+{% else %}
+{{ server.name }} ansible_host={{ server.ip }} ansible_nodename={{ server.name }}
+{% endif %}
+{% endfor %}
+
+[{{ cc_environment }}:vars]
+ansible_ssh_extra_args=-o StrictHostKeyChecking=no
+ansible_ssh_user={{ cc_ssh_user }}
+
+{% for group in cc_servers | json_query('[].groups | []') | unique %}
+[{{ group }}]
+{% for server in cc_servers %}
+{% if group in server.groups | default([]) -%}
+{{ server.name }}
+{% endif %}
+{% endfor %}
+
+{% endfor %}

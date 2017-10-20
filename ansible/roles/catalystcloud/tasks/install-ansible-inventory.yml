@@ -1,0 +1,5 @@
+- file: path=/etc/ansible state=directory
+
+- template:
+    src: roles/catalystcloud/templates/ansible-inventory.j2
+    dest: /etc/ansible/hosts
