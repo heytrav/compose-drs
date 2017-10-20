@@ -317,7 +317,7 @@ rabbitmq_service:
   deploy:
     resources:
       limits:
-        memory: 2048M
+        memory: 1048M
 celery_service:
   image: "{{ images.api.image  }}:{{ images.api.tag  }}"
   command: "{{celery_command}}"

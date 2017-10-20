@@ -1,0 +1,27 @@
+---
+- name: Deploy three networked host machines as swarm nodes
+  hosts: localhost
+  vars:
+    suffix: "staging"
+    ssh_public_key: "{{ ansible_env.HOME }}/.ssh/id_rsa.pub"
+    ssh_remote_cidr: "{{ lookup('dig', 'myip.opendns', '@resolver1.opendns.com') + '/32' | default('0.0.0.0/0', true) }}"
+    image: ubuntu-16.04-x86_64
+    private_subnet_name: "swarm-subnet{{ suffix }}"
+    keypair_name: "swarm-key{{ suffix }}"
+    router_name: "swarm-router{{ suffix }}"
+    private_network_name: ""
+    security_group_name: ""
+    flavor: c1.c1r1
+    subnet_first_octets: 192.168.99
+    instances:
+      manager1:
+        instance_name: "manager1{{ suffix }}"
+        instance_group: "swarm-managers{{ suffix }}"
+      worker1:
+        instance_name: "worker1{{ suffix }}"
+        instance_group: "swarm-workers{{ suffix }}"
+      worker2:
+        instance_name: "worker2{{ suffix }}"
+        instance_group: "swarm-workers{{ suffix }}"
+    # no changes required after this
+    region: "{{ lookup('env','OS_REGION_NAME') }}"
