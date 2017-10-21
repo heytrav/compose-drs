@@ -1,8 +1,9 @@
 ---
 - name: Deploy three networked host machines as swarm nodes
   hosts: localhost
+  roles: [catalystcloud]
   vars:
-    suffix: "staging"
+    environment: "staging"
     instances:
       manager1:
         instance_name: "manager1{{ suffix }}"
@@ -13,6 +14,29 @@
       worker2:
         instance_name: "worker2{{ suffix }}"
         instance_group: "swarm-workers{{ suffix }}"
-    # no changes required after this
-    region: "{{ lookup('env','OS_REGION_NAME') }}"
+      # no changes required after this
     tasks:
+      - name: Setup manager servers
+        set_fact:
+          managers: "{{ managers + [ {'name': item} | combine(manager_default_server, recursive=True)   ] }}"
+        with_items: "{{ groups[environment] | intersect(groups['manager']) | difference(groups['database']) }}"
+
+      - name: Add db managers to set of managers
+        set_fact:
+          managers: "{{ managers + [ {'name': item, 'mounts': [database_server_mounts]} | combine(manager_default_server, recursive=True)   ] }}"
+        with_items: "{{ groups[environment] | intersect(groups['database']) }}"
+
+      - name: Setup worker servers
+        set_fact:
+          workers: "{{ workers + [ {'name': item} | combine(worker_default_server, recursive=True)] }}"
+        with_items: "{{ groups[environment] | intersect(groups['worker']) }}"
+
+      - name: Create list of servers to for Catalyst Cloud
+        set_fact:
+          cc_servers: "{{ managers + workers }}"
+
+      - name: Setup floating ips array
+        with_items: "{{ cc_servers }}"
+        set_fact:
+          cc_floating_ips: "{{ cc_floating_ips + [{'name': item.name, 'ip': hostvars[item.name][ansible_host]}] }}"
+
