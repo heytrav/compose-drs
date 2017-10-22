@@ -4,3 +4,4 @@
 drs-stack.yml
 *-epp.json
 site.conf
+.vault_password
