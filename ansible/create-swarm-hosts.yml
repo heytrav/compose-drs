@@ -6,47 +6,37 @@
   vars:
     env_name: "staging"
   tasks:
-    - name: Setup manager servers
-      set_fact:
-        managers: "{{ managers + [ {'name': item} | combine(manager_default_server, recursive=True)   ] }}"
-      with_items: "{{ env_managers }}"
 
-    - name: Add db managers to set of managers
-      set_fact:
-        managers: "{{ managers + [ {'name': item, 'mounts': [database_server_mounts]} | combine(manager_default_server, recursive=True)   ] }}"
-      with_items: "{{ env_db_managers}}"
-
-    - name: Setup worker servers
-      set_fact:
-        workers: "{{ workers + [ {'name': item} | combine(worker_default_server, recursive=True)] }}"
-      with_items: "{{ env_workers }}"
-
-    - name: Create list of servers to for Catalyst Cloud
-      set_fact:
-        cc_servers: "{{ managers + workers }}"
-
-    - debug:
-        msg: "{{ cc_servers }}" 
-
-    - name: Setup floating ips array
-      with_items: "{{ cc_servers }}"
-      set_fact:
-        cc_floating_ips: "{{ cc_floating_ips + [{'name': item.name, 'ip': hostvars[item.name].ansible_host}] }}"
-
-    - debug:
-        msg: "{{ cc_floating_ips }}"
+    - include: tasks/pre-flight-variables.yml
 
     - name: Connect to Catalyst Cloud
       os_auth:
 
-    - name: Import an SSH keypair
-      os_keypair:
-        state: present
-        name: "{{ cc_default_keypair_name }}"
-        public_key_file: "{{ ssh_public_key }}"
 
     - include: roles/catalystcloud/tasks/create-keypair.yml
-    - include: roles/catalystcloud/tasks/create-network.yml
+    - name: Create Network
+      os_network:
+        name: "{{ cc_network_name }}"
+        state: present
+
+    - name: Create subnet
+      os_subnet:
+        name: "{{ cc_subnet_name }}"
+        network_name: "{{ cc_network_name }}"
+        state: present
+        cidr: "{{ cc_subnet_cidr }}"
+        allocation_pool_start: "{{ cc_subnet_dhcp_start }}"
+        allocation_pool_end: "{{ cc_subnet_dhcp_end }}"
+        ip_version: 4
+
+    - name: Create router
+      os_router:
+        state: present
+        name: "{{ cc_router_name }}"
+        network: "{{ cc_public_net_name }}"
+        interfaces:
+          - "{{ cc_subnet_name }}"
+
     - include: roles/catalystcloud/tasks/create-security-groups.yml
     - include: roles/catalystcloud/tasks/create-servers.yml
 

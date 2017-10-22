@@ -5,15 +5,29 @@
   vars:
     env_name: "staging"
   tasks:
+    - include: tasks/pre-flight-variables.yml
 
     - name: Connect to Catalyst Cloud
       os_auth:
 
     - name: Remove swarm servers
       os_server:
-        name: "{{ item }}"
+        name: "{{ item.name }}"
         state: absent
-      with_items: "{{ env_managers + env_db_managers + env_workers }}"
+      with_items: "{{ cc_servers }}"
+
+
+    - name: Remove ports
+      os_port:
+        name: "{{ item.name }}"
+        state: absent
+      with_items: "{{ cc_servers }}"
+
+    - name: Remove volumes
+      os_volume:
+        name: "{{ item.name }}-data"
+        state: absent
+      with_items: "{{ cc_servers }}"
 
 
     - name: Remove swarm keypair

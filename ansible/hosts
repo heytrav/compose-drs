@@ -1,9 +1,9 @@
 [swarm]
-manager1-staging ansible_host=150.242.40.212
-manager2-staging ansible_host=150.242.40.218
-worker1-staging ansible_host=150.242.40.216
-worker2-staging ansible_host=150.242.40.210
-worker3-staging ansible_host=150.242.40.21
+manager1-staging ansible_host=150.242.40.212 fixed_ip=192.168.99.103
+manager2-staging ansible_host=150.242.40.218 fixed_ip=192.168.99.104
+worker1-staging ansible_host=150.242.40.216 fixed_ip=192.168.99.100
+worker2-staging ansible_host=150.242.40.210 fixed_ip=192.168.99.101
+worker3-staging ansible_host=150.242.40.21 fixed_ip=192.168.99.102
 manager1-production
 manager2-production
 worker1-production
