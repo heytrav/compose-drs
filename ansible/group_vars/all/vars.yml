@@ -1,6 +1,5 @@
 ---
-suffix: "-{{ environment }}"
-cc_network_name: public-net
+suffix: "-{{ env_name }}"
 subnet_first_octets: 192.168.99
 cc_default_keypair_name: "swarm-key{{ suffix }}"
 cc_default_keypair_pubkey: "{{ ansible_env.HOME }}/.ssh/id_rsa.pub"
@@ -18,7 +17,6 @@ cc_volume_device_name: /dev/vdb
 cc_volume_group_name: data
 managers: []
 workers: []
-cc_servers: []
 cc_floating_ips: []
 region_nameservers:
   nz-por-1: [202.78.247.197, 202.78.247.198, 202.78.247.199]
@@ -47,7 +45,6 @@ worker_default_server:
   os_image: "{{ cc_default_os_image }}"
   volume_size_mb: 20048
   security_groups: "default,{{ security_group_name }}"
-  groups: ["worker", "swarm"]
 
 database_server_mounts:  
   name: 'lib-mysql' 
@@ -55,7 +52,9 @@ database_server_mounts:
   size: '5000m' 
   fstype: 'btrfs' 
 
-
+env_managers: "{{ groups[env_name] | intersect(groups['manager']) | difference(groups['database'])  }}"
+env_db_managers: "{{ groups[env_name] | intersect(groups['database']) }}"
+env_workers: "{{ groups[env_name] | intersect(groups['worker']) }}"
 
 database_host: domaindb
 rabbitmq_host: rabbitmq

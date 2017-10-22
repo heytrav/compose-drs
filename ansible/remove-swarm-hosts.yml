@@ -1,0 +1,54 @@
+---
+- name: Terminate swarm hosts and remove all networks, security groups, etc.
+  hosts: localhost
+  roles: [catalystcloud]
+  vars:
+    env_name: "staging"
+  tasks:
+
+    - name: Connect to Catalyst Cloud
+      os_auth:
+
+    - name: Remove swarm servers
+      os_server:
+        name: {{ item }}
+        state: absent
+      with_items: "{{ env_managers + env_db_managers + env_workers }}"
+
+
+    - name: Remove swarm keypair
+      os_keypair: 
+        state: absent
+        name: "{{ cc_default_keypair_name }}"
+
+    - name: Remove swarm router
+      os_router:
+        state: absent
+        name: "{{ cc_router_name }}"
+
+    - name: Remove swarm network
+      os_network:
+        state: absent
+        name: "{{ cc_network_name }}"
+
+    - name: Remove security group
+      os_security_group:
+        name: "{{ item }}"
+        state: absent
+      with_items: "{{ cc_security_group_names }}"
+
+    - name: Remove hosts from local ~/.ssh/config
+      blockinfile:
+        dest: "{{ ansible_env.HOME }}/.ssh/config"
+        state: absent
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
+      with_items: "{{ env_managers + env_db_managers + env_workers }}"
+
+    - name: Remove host from /etc/hosts
+      become: yes
+      blockinfile:
+        dest: /etc/hosts
+        state: absent
+        insertafter: EOF
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
+      with_items: "{{ env_managers + env_db_managers + env_workers }}"
