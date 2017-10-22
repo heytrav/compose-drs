@@ -40,7 +40,7 @@
           - "{{ cc_subnet_name }}"
 
     - include: roles/catalystcloud/tasks/create-security-groups.yml
-    - include: roles/catalystcloud/tasks/create-servers.yml
+    - include: tasks/create-servers.yml
 
     - wait_for:
        host: "{{ hostvars[item.name].ansible_host }}"
