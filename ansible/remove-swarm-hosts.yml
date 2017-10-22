@@ -11,7 +11,7 @@
 
     - name: Remove swarm servers
       os_server:
-        name: {{ item }}
+        name: "{{ item }}"
         state: absent
       with_items: "{{ env_managers + env_db_managers + env_workers }}"
 
