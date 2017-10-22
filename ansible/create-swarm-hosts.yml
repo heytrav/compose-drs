@@ -39,8 +39,14 @@
     - name: Connect to Catalyst Cloud
       os_auth:
 
+    - name: Import an SSH keypair
+      os_keypair:
+        state: present
+        name: "{{ cc_default_keypair_name }}"
+        public_key_file: "{{ ssh_public_key }}"
 
     - include: roles/catalystcloud/tasks/create-keypair.yml
+    - include: roles/catalystcloud/tasks/create-network.yml
     - include: roles/catalystcloud/tasks/create-security-groups.yml
     - include: roles/catalystcloud/tasks/create-servers.yml
 
