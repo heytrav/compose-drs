@@ -10,6 +10,12 @@
     - name: Connect to Catalyst Cloud
       os_auth:
 
+    - name: Remove floating ips from known_hosts
+      known_hosts:
+        name: "{{ item.name }}"
+        state: absent
+      with_items: "{{ cc_servers }}"
+
     - name: Remove swarm servers
       os_server:
         name: "{{ item.name }}"

@@ -3,6 +3,8 @@
   hosts: localhost
   roles: [catalystcloud]
   gather_facts: true
+  tags:
+    - provision
   vars:
     env_name: "staging"
   tasks:
@@ -40,15 +42,31 @@
     - include: roles/catalystcloud/tasks/create-security-groups.yml
     - include: roles/catalystcloud/tasks/create-servers.yml
 
+    - wait_for:
+       host: "{{ hostvars[item.name].ansible_host }}"
+       port: 22
+      with_items: "{{ cc_servers }}"
+      tags: wait_for
+
+    - name: Remove floating ips from known_hosts
+      known_hosts:
+        name: "{{ item.ip }}"
+        state: absent
+      with_items: "{{ cc_floating_ips }}"
+
     - name: Add newly created hosts to local ~/.ssh/config
       tags: local-changes
       blockinfile:
         dest: "{{ ansible_env.HOME }}/.ssh/config"
         insertbefore: BOF
         block: |
+          Host {{ hostvars[item.name].ansible_host }}
+              User ubuntu
+              StrictHostKeyChecking no
           Host {{ item.name }}
               Hostname {{ hostvars[item.name].ansible_host }}
               User ubuntu
+              StrictHostKeyChecking no
         marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
       with_items: "{{ cc_servers }}"
 
@@ -63,25 +81,32 @@
         marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
       with_items: "{{ cc_servers }}"
 
-    - wait_for:
-       host: "{{ hostvars[item.name].ansible_host }}"
-       port: 22
-      with_items: "{{ cc_servers }}"
-
 
 - name: Install python on new hosts
   hosts: "{{ env_name }}"
   become: yes
   roles: [common]
-  gather_facts: true
+  gather_facts: false
+  tags:
+    - provision
+    - firstonly
   tasks:
     - include: roles/common/tasks/install-python.yml
 
 
 - name: Install Docker on swarm hosts
   hosts: "{{ env_name }}"
+  tags: 
+    - docker
   become: yes
+  gather_facts: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python
   tasks:
+    - name: Add NZ locale to instances
+      locale_gen: 
+        name: en_NZ.UTF-8
+        state: present
 
     - name: Add entry to /etc/hosts for all instances
       lineinfile:
@@ -147,9 +172,9 @@
       notify:
         - start docker
 
-    - name: Add "{{ lookup('env', 'USER') }}" user to docker group
+    - name: Add ubuntu user to docker group
       user:
-        name: "{{ lookup('env', 'USER') }}"
+        name: ubuntu
         append: yes
         groups: docker
 
