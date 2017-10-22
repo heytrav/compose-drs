@@ -2,6 +2,7 @@
 - name: Deploy three networked host machines as swarm nodes
   hosts: localhost
   roles: [catalystcloud]
+  gather_facts: true
   vars:
     env_name: "staging"
   tasks:
