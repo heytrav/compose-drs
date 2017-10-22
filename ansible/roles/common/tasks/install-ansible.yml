@@ -1,0 +1,19 @@
+#
+# Will install ansible (with openstack support) in to system python
+#
+
+- name: Install python packages
+  apt: name="{{ item }}"
+  with_items: [python-dev, python-setuptools, python-pip, gcc, git, libssl-dev, libffi-dev]
+  when: common_osfamily == 'debian'
+
+- name: Install python packages
+  yum: name="{{ item }}"
+  with_items: [python-devel, python-setuptools, python-pip, gcc, git, openssl-devel]
+  when: common_osfamily == 'redhat'
+
+- name: Install wheels
+  shell: "(pip list | grep --silent {{ item }} && echo present) || pip install {{ item }}"
+  with_items: [ansible, shade]
+  register: installed
+  changed_when: "installed.stdout != 'present'"

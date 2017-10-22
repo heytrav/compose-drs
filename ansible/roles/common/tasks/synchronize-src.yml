@@ -1,0 +1,35 @@
+---
+#
+# Synchronize local source code repository from localhost to target host
+#
+- name: Generate file list
+  shell: git ls-files > /tmp/.git-ls-files
+  become: false
+  changed_when: false
+  args:
+    chdir: "{{ git_root }}"
+  delegate_to: 'localhost'
+
+- name: Generate file list (submodules)
+  shell: "git submodule --quiet foreach 'git ls-files | sed \"s|^|$path/|\"' >> /tmp/.git-ls-files"
+  become: false
+  changed_when: false
+  args:
+    chdir: "{{ git_root }}"
+  delegate_to: 'localhost'
+
+- name: Rsync source tree
+  synchronize: src="{{ git_root }}" dest="{{ src_dest }}" rsync_opts="{{ rsync_opts }}" owner=no group=no
+  vars:
+    rsync_opts: "--files-from=/tmp/.git-ls-files"
+
+# this is crappy, but a touch more reliable that git clone from our internal
+# gitlab with its odd cert
+
+- name: "Rsync .git dir"
+  synchronize: src="{{ git_root }}/.git" dest="{{ src_dest }}" owner=no group=no
+  when: "include_git_dir | default(false)"
+
+# https://github.com/ansible/ansible/issues/13680 
+- name: Change ownership of src directory
+  file: path="{{ src_dest }}" recurse=yes owner="{{ src_owner }}"

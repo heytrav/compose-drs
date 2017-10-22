@@ -1,0 +1,9 @@
+#
+# Can be used to set up python on a host so that ansible can run on it.  When
+# using this task, it is important to set gather_facts: false in the play that
+# includes it
+#
+- raw: >
+    which python || sudo {{ ' yum' if common_osfamily == 'redhat' else 'apt-get'  }} install -y python && echo 'installed'
+  register: python
+  changed_when: python.stdout == 'installed'

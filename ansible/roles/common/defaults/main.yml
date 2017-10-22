@@ -1,0 +1,4 @@
+---
+#
+# common_osfamily: debian | redhat
+common_osfamily: "{{ ansible_os_family | default(omit) | lower }}"
