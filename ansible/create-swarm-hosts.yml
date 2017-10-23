@@ -189,12 +189,14 @@
   hosts: "primary_manager:&{{ env_name }}"
   tags: 
     - swarm 
+    - init
   tasks:
     - name: Initiate swarm on host
       command: docker swarm init
       register: swarm_init_result
       ignore_errors: true
       changed_when: "'Swarm initialized' in swarm_init_result.stdout"
+      failed_when: "swarm_init_result.rc == 1 and 'node is already part of a swarm' not in swarm_init_result.stderr"
 
     - name: Fetch manager token
       command: docker swarm join-token manager
@@ -212,11 +214,6 @@
       set_fact:
         worker_join_token: "{{ worker_token_output.stdout_lines[2] }}"
 
-    - debug: 
-        msg: "manager token: {{ manager_join_token  }}"
-
-    - debug: 
-        msg: "worker token: {{ worker_join_token  }}"
 
 - name: Set up alternate managers
   hosts: "{{ env_name }}:&manager:!primary_manager"
@@ -227,6 +224,11 @@
 
     - name: Run manager token on alternate managers
       command: "{{ hostvars[primary_manager].manager_join_token }}"
+      ignore_errors: true
+      register: manager_join_result
+      changed_when: "'node joined a swarm' in manager_join_result.stdout"
+      failed_when: "manager_join_result.rc == 1 and 'node is already part of a swarm' not in manager_join_result.stderr"
+
 
 
 - name: Set up workers
@@ -237,3 +239,7 @@
   tasks:
     - name: Apply join token to workers
       command: "{{ hostvars[primary_manager].worker_join_token }}"
+      register: worker_join_result
+      ignore_errors: true
+      changed_when: "'node joined a swarm' in worker_join_result.stdout"
+      failed_when: "worker_join_result.rc == 1 and 'node is already part of a swarm' not in worker_join_result.stderr"
