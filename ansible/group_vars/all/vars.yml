@@ -58,6 +58,8 @@ env_managers: "{{ groups[env_name] | intersect(groups['manager']) | difference(g
 env_db_managers: "{{ groups[env_name] | intersect(groups['database']) }}"
 env_workers: "{{ groups[env_name] | intersect(groups['worker']) }}"
 
+primary_manager: "{{ groups['primary_manager'] | intersect(groups[env_name]) | first }}"
+
 database_host: domaindb
 rabbitmq_host: rabbitmq
 rabbitmq_port: 5672

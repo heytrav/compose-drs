@@ -43,5 +43,7 @@ worker3-production
 manager2-staging
 manager2-production
 
-
+[primary_manager]
+manager1-staging
+manager1-production
 

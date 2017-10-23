@@ -185,3 +185,55 @@
         state: started
 
 
+- name: Setup swarm cluster
+  hosts: "primary_manager:&{{ env_name }}"
+  tags: 
+    - swarm 
+  tasks:
+    - name: Initiate swarm on host
+      command: docker swarm init
+      register: swarm_init_result
+      ignore_errors: true
+      changed_when: "'Swarm initialized' in swarm_init_result.stdout"
+
+    - name: Fetch manager token
+      command: docker swarm join-token manager
+      register: manager_token_output
+
+    - name: Set manager token
+      set_fact:
+        manager_join_token: "{{ manager_token_output.stdout_lines[2] }}"
+
+    - name: Fetch worker token
+      command: docker swarm join-token worker
+      register: worker_token_output
+
+    - name: Set worker token
+      set_fact:
+        worker_join_token: "{{ worker_token_output.stdout_lines[2] }}"
+
+    - debug: 
+        msg: "manager token: {{ manager_join_token  }}"
+
+    - debug: 
+        msg: "worker token: {{ worker_join_token  }}"
+
+- name: Set up alternate managers
+  hosts: "{{ env_name }}:&manager:!primary_manager"
+  tags:
+    - swarm
+    - manager
+  tasks:
+
+    - name: Run manager token on alternate managers
+      command: "{{ hostvars[primary_manager].manager_join_token }}"
+
+
+- name: Set up workers
+  hosts: "{{ env_name }}:&worker"
+  tags:
+    - swarm
+    - worker
+  tasks:
+    - name: Apply join token to workers
+      command: "{{ hostvars[primary_manager].worker_join_token }}"
