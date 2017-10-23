@@ -18,7 +18,6 @@
   when: "item.volume_size_mb is defined"
 
 - name: Create servers
-  with_items: "{{ cc_servers }}"
   os_server:
     state: present
     name: "{{ item.name }}"
@@ -28,6 +27,28 @@
     nics:
       - port-name: "{{ item.name }}"
     volume_size: "{{ item.boot_volume_size_gb | default(omit) }}"
+    security_groups: "{{ item.security_groups }}"
+    auto_ip: false
+    userdata: |
+               #cloud-config
+               users:
+               - name: "{{ cc_ssh_user }}"
+                 shell: /bin/bash
+                 lock_passwd: true
+                 sudo: ALL=(ALL) NOPASSWD:ALL
+                 ssh_authorized_keys:
+                     - "{{ cc_default_keypair_pubkey }}"
+                 {% for key in item.authorized_keys | default(cc_default_server_authorized_keys) %}
+                   - "{{ key }}"
+                 {% endfor %}
+               fqdn: "{{ item.name }}.{{ item.domain | default(cc_default_domain) }}"
+               manage_resolv_conf: true
+               resolv_conf:
+                 nameservers: "{{ item.nameservers | default(cc_default_nameservers) }}"
+                 searchdomains:
+                   - "{{ cc_default_domain }}"
+                 domain: "{{ cc_default_domain }}"
+  with_items: "{{ cc_servers }}"
 
 
 - name: Attach volume to server
