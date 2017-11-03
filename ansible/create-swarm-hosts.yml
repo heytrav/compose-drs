@@ -1,5 +1,5 @@
 ---
-- name: Deploy three networked host machines as swarm nodes
+- name: Deploy set of networked host machines as swarm nodes
   hosts: localhost
   roles: [catalystcloud]
   gather_facts: true
@@ -11,48 +11,8 @@
 
     - include: tasks/pre-flight-variables.yml
 
-    - name: Connect to Catalyst Cloud
-      os_auth:
+    - include: tasks/cc-create-stack.yml
 
-
-    - include: roles/catalystcloud/tasks/create-keypair.yml
-    - name: Create Network
-      os_network:
-        name: "{{ cc_network_name }}"
-        state: present
-
-    - name: Create subnet
-      os_subnet:
-        name: "{{ cc_subnet_name }}"
-        network_name: "{{ cc_network_name }}"
-        state: present
-        cidr: "{{ cc_subnet_cidr }}"
-        allocation_pool_start: "{{ cc_subnet_dhcp_start }}"
-        allocation_pool_end: "{{ cc_subnet_dhcp_end }}"
-        ip_version: 4
-
-    - name: Create router
-      os_router:
-        state: present
-        name: "{{ cc_router_name }}"
-        network: "{{ cc_public_net_name }}"
-        interfaces:
-          - "{{ cc_subnet_name }}"
-
-    - include: roles/catalystcloud/tasks/create-security-groups.yml
-    - include: tasks/create-servers.yml
-
-    - wait_for:
-       host: "{{ hostvars[item.name].ansible_host }}"
-       port: 22
-      with_items: "{{ cc_servers }}"
-      tags: wait_for
-
-    - name: Remove floating ips from known_hosts
-      known_hosts:
-        name: "{{ item.ip }}"
-        state: absent
-      with_items: "{{ cc_floating_ips }}"
 
     - name: Add newly created hosts to local ~/.ssh/config
       tags: local-changes

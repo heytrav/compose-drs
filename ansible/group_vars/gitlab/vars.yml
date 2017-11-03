@@ -1,0 +1,22 @@
+---
+cc_network_name: trav-network
+cc_subnet_name: trav-subnet
+cc_router_name: trav-router
+cc_subnet_prefix: 10.70.0
+cc_ssh_user: gitlab
+security_group_name: gitlab-runner-sg
+
+gitlab_servers: []
+
+cc_security_groups:
+  - {group: "{{ security_group_name }}", port: 22, remote_ip_prefix: "{{ ssh_remote_cidr }}"}
+
+gitlab_appliance_default:
+  flavor: c1.c1r4
+  os_image: "{{ cc_default_os_image }}"
+  volume_size_mb: 20048
+  security_groups: "default,{{ security_group_name }}"
+  mounts:
+    - { name: "opt", path: "/opt", size: "5000m", fstype: "btrfs" }
+    - { name: "gitlab", path: "/var/lib/gitlab", size: "7000m", fstype: "btrfs" }
+

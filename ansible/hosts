@@ -1,9 +1,22 @@
-[swarm]
+[stack]
 manager1-staging ansible_host=150.242.40.212 fixed_ip=192.168.99.103
 manager2-staging ansible_host=150.242.40.218 fixed_ip=192.168.99.104
 worker1-staging ansible_host=150.242.40.216 fixed_ip=192.168.99.100
 worker2-staging ansible_host=150.242.40.210 fixed_ip=192.168.99.101
 worker3-staging ansible_host=150.242.40.21 fixed_ip=192.168.99.102
+manager1-production
+manager2-production
+worker1-production
+worker2-production
+worker3-production
+gitlab-runner1 ansible_host=150.242.40.222 fixed_ip=10.70.0.100
+
+[swarm]
+manager1-staging
+manager2-staging
+worker1-staging
+worker2-staging
+worker3-staging
 manager1-production
 manager2-production
 worker1-production
@@ -46,4 +59,8 @@ manager2-production
 [primary_manager]
 manager1-staging
 manager1-production
+
+
+[gitlab]
+gitlab-runner1
 

@@ -1,0 +1,15 @@
+---
+- name: Create gitlab runner host
+  hosts: localhost
+  roles: [catalystcloud]
+  gather_facts: true
+  tags:
+    - provision
+  tasks:
+    - include: tasks/preflight-build-gitlab.yml
+
+    - name: Connect to Catalyst Cloud
+      os_auth:
+
+    - include: tasks/cc-create-stack.yml
+
