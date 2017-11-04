@@ -13,6 +13,7 @@
   tags:
     - provision
   tasks:
+    - include_vars: group_vars/gitlab/vars.yml
     - include: tasks/preflight-build-gitlab.yml
 
     - name: Connect to Catalyst Cloud
@@ -27,11 +28,11 @@
         insertbefore: BOF
         block: |
           Host {{ hostvars[item.name].ansible_host }}
-              User ubuntu
+              User gitlab
               StrictHostKeyChecking no
           Host {{ item.name }}
               Hostname {{ hostvars[item.name].ansible_host }}
-              User ubuntu
+              User gitlab
               StrictHostKeyChecking no
         marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
       with_items: "{{ cc_servers }}"
