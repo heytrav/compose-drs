@@ -1,7 +1,7 @@
 ---
 - name: Setup gitlab servers
   set_fact:
-    gitlab_servers: "{{ gitlab_servers + [{'name': item, 'ip': hostvars[item].fixed_ip} | combine(gitlab_appliance_default, recursive=True)] }}"
+    cc_servers: "{{ cc_servers + [{'name': item, 'ip': hostvars[item].fixed_ip} | combine(gitlab_appliance_default, recursive=True)] }}"
   with_items: "{{ groups['gitlab'] }}"
 
 - name: Setup floating ips array

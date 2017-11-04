@@ -3,6 +3,13 @@
   hosts: localhost
   roles: [catalystcloud]
   gather_facts: true
+  vars:
+    cc_network_name: trav-network
+    cc_default_keypair_name: gitlab-key
+    cc_subnet_name: trav-subnet
+    cc_router_name: trav-router
+    security_group_name: gitlab-runner-sg
+
   tags:
     - provision
   tasks:
@@ -12,6 +19,33 @@
       os_auth:
 
     - include: tasks/cc-create-stack.yml
+
+    - name: Add newly created hosts to local ~/.ssh/config
+      tags: local-changes
+      blockinfile:
+        dest: "{{ ansible_env.HOME }}/.ssh/config"
+        insertbefore: BOF
+        block: |
+          Host {{ hostvars[item.name].ansible_host }}
+              User ubuntu
+              StrictHostKeyChecking no
+          Host {{ item.name }}
+              Hostname {{ hostvars[item.name].ansible_host }}
+              User ubuntu
+              StrictHostKeyChecking no
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
+      with_items: "{{ cc_servers }}"
+
+    - name: Add newly created hosts to /etc/hosts
+      tags: local-changes
+      become: yes
+      blockinfile:
+        dest: /etc/hosts
+        insertafter: EOF
+        block: |
+          {{ hostvars[item.name]['ansible_host'] }} {{ item.name }}
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
+      with_items: "{{ cc_servers }}"
 
 - name: Install python on new hosts
   hosts: "{{ env_name }}"
@@ -29,19 +63,19 @@
   hosts: "{{ env_name }}"
   become: yes
   roles: [docker]
-  pre_tasks:
-    - name: Add NZ locale to instances
-      locale_gen: 
-        name: en_NZ.UTF-8
-        state: present
 
-  post_tasks:
+  pre_tasks:
     - name: Add entry to /etc/hosts for all instances
       lineinfile:
         dest: /etc/hosts
         line: "{{ hostvars[item].fixed_ip }} item"
       with_items: "{{ groups[env_name] }}"
 
+  post_tasks:
+    - name: Add NZ locale to instances
+      locale_gen: 
+        name: en_NZ.UTF-8
+        state: present
 
 - name: Install gitlab-runner on gitlab machine
   become: yes

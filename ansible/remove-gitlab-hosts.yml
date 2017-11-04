@@ -1,0 +1,81 @@
+---
+- name: Terminate GitLab hosts and remove all networks, security groups, etc.
+  hosts: localhost
+  roles: [catalystcloud]
+  vars:
+    cc_network_name: trav-network
+    cc_default_keypair_name: gitlab-key
+    cc_subnet_name: trav-subnet
+    cc_router_name: trav-router
+    security_group_name: gitlab-runner-sg
+
+  tasks:
+    - include_vars: group_vars/gitlab/vars.yml
+
+    - include: tasks/preflight-build-gitlab.yml
+
+    - name: Connect to Catalyst Cloud
+      os_auth:
+
+    - name: Remove floating ips from known_hosts
+      known_hosts:
+        name: "{{ item.name }}"
+        state: absent
+      with_items: "{{ cc_servers }}"
+
+    - name: Remove GitLab host machines
+      os_server:
+        name: "{{ item.name }}"
+        state: absent
+      with_items: "{{ cc_servers }}"
+
+
+    - name: Remove ports
+      os_port:
+        name: "{{ item.name }}"
+        state: absent
+      with_items: "{{ cc_servers }}"
+
+    - name: Remove volumes
+      os_volume:
+        name: "{{ item.name }}-data"
+        state: absent
+      with_items: "{{ cc_servers }}"
+
+
+    - name: Remove GitLab key pair
+      os_keypair: 
+        state: absent
+        name: "{{ cc_default_keypair_name }}"
+
+    - name: Remove GitLab router
+      os_router:
+        state: absent
+        name: "{{ cc_router_name }}"
+
+    - name: Remove GitLab network
+      os_network:
+        state: absent
+        name: "{{ cc_network_name }}"
+
+    - name: Remove security group
+      os_security_group:
+        name: "{{ item }}"
+        state: absent
+      with_items: "{{ cc_security_group_names }}"
+
+    - name: Remove hosts from local ~/.ssh/config
+      blockinfile:
+        dest: "{{ ansible_env.HOME }}/.ssh/config"
+        state: absent
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
+      with_items: "{{ groups['gitlab'] }}"
+
+    - name: Remove host from /etc/hosts
+      become: yes
+      blockinfile:
+        dest: /etc/hosts
+        state: absent
+        insertafter: EOF
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
+      with_items: "{{ groups['gitlab'] }}"
