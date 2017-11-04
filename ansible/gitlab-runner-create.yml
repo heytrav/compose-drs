@@ -9,7 +9,7 @@
       shell: >
         gitlab-runner register --url {{ gitlab_url }}
         --locked --tag-list docker,dr-api
-        --description "Docker gitlab runner"
+        --description "trav-runner1"
         --registration-token {{ gitlab_registration_token }}
         --executor "docker" 
         --docker-image ubuntu:xenial
