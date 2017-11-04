@@ -15,3 +15,6 @@ gitlab_appliance_default:
 
 cc_security_groups:
   - {group: "{{ security_group_name }}", port: 22, remote_ip_prefix: "{{ ssh_remote_cidr }}"}
+
+
+gitlab_url: https://gitlab.catalyst.net.nz/

@@ -1,0 +1,21 @@
+---
+- name: Create a gitlab runner
+  become: true
+  hosts: "{{ runner }}"
+  tasks:
+
+    - name: Register gitlab runner
+      tags: register
+      shell: >
+        gitlab-runner register --url {{ gitlab_url }}
+        --locked --tag-list docker,dr-api
+        --description "Docker gitlab runner"
+        --registration-token {{ gitlab_registration_token }}
+        --executor "docker" 
+        --docker-image ubuntu:xenial
+        --non-interactive --run-untagged=false
+
+    - name: Un-register gitlab runners
+      tags: unregister
+      shell: gitlab-runner unregister --all-runners
+
