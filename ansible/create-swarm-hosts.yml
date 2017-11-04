@@ -76,8 +76,6 @@
         line: "{{ hostvars[item].fixed_ip }} item"
       with_items: "{{ groups[env_name] }}"
 
-
-
 - name: Setup swarm cluster
   hosts: "primary_manager:&{{ env_name }}"
   tags: 

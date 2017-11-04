@@ -23,3 +23,58 @@
     - firstonly
   tasks:
     - include: roles/common/tasks/install-python.yml
+
+
+- name: Install docker on gitlab machine
+  hosts: "{{ env_name }}"
+  become: yes
+  roles: [docker]
+  pre_tasks:
+    - name: Add NZ locale to instances
+      locale_gen: 
+        name: en_NZ.UTF-8
+        state: present
+
+  post_tasks:
+    - name: Add entry to /etc/hosts for all instances
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item].fixed_ip }} item"
+      with_items: "{{ groups[env_name] }}"
+
+
+- name: Install gitlab-runner on gitlab machine
+  become: yes
+  hosts: "{{ env_name }}"
+  tasks:
+    - name: Get os release name
+      command: lsb_release -cs
+      register: ubuntu_release
+
+    - name: Add GitLab apt key
+      apt_key:
+        url: https://packages.gitlab.com/gpg.key
+        state: present
+
+    - name: Install GitLab Runner dependencies
+      apt:
+        name: '{{ item }}'
+        state: present
+      with_items:
+        - debian-archive-keyring
+        - apt-transport-https
+
+    - name: Add GitLab Runner apt repo
+      apt_repository:
+        repo: 'deb https://packages.gitlab.com/runner/gitlab-ci-multi-runner/ubuntu/ {{ ubuntu_release.stdout }} main'
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install GitLab Runner
+      apt:
+        name: gitlab-ci-multi-runner
+        state: latest
+        update_cache: no

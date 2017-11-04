@@ -19,4 +19,5 @@ gitlab_appliance_default:
   mounts:
     - { name: "opt", path: "/opt", size: "5000m", fstype: "btrfs" }
     - { name: "gitlab", path: "/var/lib/gitlab", size: "7000m", fstype: "btrfs" }
+    - { name: "docker", path: "/var/lib/docker", size: "10000m", fstype: "ext4" }
 
