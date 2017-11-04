@@ -13,3 +13,13 @@
 
     - include: tasks/cc-create-stack.yml
 
+- name: Install python on new hosts
+  hosts: "{{ env_name }}"
+  become: yes
+  roles: [common]
+  gather_facts: false
+  tags:
+    - provision
+    - firstonly
+  tasks:
+    - include: roles/common/tasks/install-python.yml
