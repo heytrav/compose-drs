@@ -1,0 +1,10 @@
+---
+- name: Create a gitlab runner
+  become: true
+  hosts: "{{ appliance_name }}"
+  tasks:
+
+    - name: Unregister python test gitlab runner
+      tags: 
+        - pythontest1
+      shell: gitlab-runner unregister -n trav-python-test-runner1
