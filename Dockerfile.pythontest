@@ -1,24 +1,20 @@
 # image: gitlab.catalyst.net.nz:4567/domain-registration-api/registration-api/python-test-base:v1
 # projects: adservices, adcron, dt-adcollector, etc.
 # description: Base image for python3 based projects and unittests.
-FROM ubuntu:xenial
+FROM ubuntu:16.04
 
-MAINTAINER Travis Holton <travis@catalyst.net.nz>
+MAINTAINER Travis Holton <travis at catalyst dot net dot nz>
 
-RUN apt-get update && apt-get install -y \
-      git \
+RUN apt update && apt -y install \
       language-pack-en-base \
+      libmysqlclient-dev \
+      mysql-client \
       libncurses5-dev \
-      libpq-dev \
-      postgresql \
       python3-nose2 \
       python3-pip \
-      python3.4 \
-      python3.4-dev
+      python3.5 \
+      python3.5-dev \
+      jq
 
-ENV LANG en_NZ.UTF-8
-RUN echo 'Pacific/Auckland' > /etc/timezone
-RUN dpkg-reconfigure -f noninteractive tzdata
 
-RUN pip3 install --upgrade pip
-RUN pip3 install pep8
+RUN pip3 install --upgrade pip pep8

@@ -1,21 +1,28 @@
 ---
 - name: Create a gitlab runner
   become: true
-  hosts: "{{ runner }}"
+  hosts: "{{ appliance_name }}"
   tasks:
 
-    - name: Register gitlab runner
-      tags: register
+    - name: Register python test gitlab runner
+      tags: 
+        - pythontest1
       shell: >
         gitlab-runner register --url {{ gitlab_url }}
-        --locked --tag-list docker,dr-api
-        --description "trav-runner1"
+        --locked --tag-list docker,dr-api,python
+        --description "trav-python-test-runner1"
         --registration-token {{ gitlab_registration_token }}
         --executor "docker" 
-        --docker-image ubuntu:xenial
+        --docker-image gitlab.catalyst.net.nz:4567/domain-registration-api/registration-api/python-test-base:v1
         --non-interactive --run-untagged=false
 
-    - name: Un-register gitlab runners
-      tags: unregister
-      shell: gitlab-runner unregister --all-runners
-
+    - name: Register python test gitlab runner
+      tags: 
+        - shell1
+      shell: >
+        gitlab-runner register --url {{ gitlab_url }}
+        --locked --tag-list docker,dr-api,shell
+        --description "trav-shell-test-runner1"
+        --registration-token {{ gitlab_registration_token }}
+        --executor "shell" 
+        --non-interactive --run-untagged=false

@@ -113,3 +113,18 @@
         name: gitlab-ci-multi-runner
         state: latest
         update_cache: no
+
+    - name: Add gitlab-runner user to docker group
+      user:
+        name: gitlab-runner
+        append: yes
+        groups: docker
+      notify: restart gitlab
+
+
+  handlers:
+    - name: restart gitlab
+      systemd:
+        state: restarted
+        name: gitlab-runner
+
