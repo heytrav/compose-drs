@@ -13,7 +13,7 @@
         --description "trav-python-test-runner1"
         --registration-token {{ gitlab_registration_token }}
         --executor "docker" 
-        --docker-image gitlab.catalyst.net.nz:4567/domain-registration-api/registration-api/python-test-base:v1
+        --docker-image gitlab.catalyst.net.nz:4567/domain-registration-api/registration-api/python-test-base:v2
         --non-interactive --run-untagged=false
 
     - name: Register python test gitlab runner
