@@ -1,4 +1,5 @@
 ---
+# TODO: Add alternative steps for centos, other distros.
 - name: Apt dist upgrade
   apt:
     upgrade: dist
