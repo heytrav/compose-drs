@@ -17,6 +17,7 @@ cc_default_flavor: c1.c1r1
 cc_ssh_user: ubuntu
 cc_volume_device_name: /dev/vdb
 cc_volume_group_name: data
+cc_default_volume_size: 20048
 managers: []
 workers: []
 cc_floating_ips: []
@@ -28,31 +29,25 @@ region_nameservers:
 cc_default_nameservers: "{{ region_nameservers[lookup('env', 'OS_REGION_NAME')] }}"
 
 
-
-cc_security_groups:
+default_security_groups:
   - {group: "{{ security_group_name }}", port: 22, remote_ip_prefix: "{{ ssh_remote_cidr }}"}
   - {group: "{{ security_group_name }}", port: 80, remote_ip_prefix: "0.0.0.0/0"}
   - {group: "{{ security_group_name }}", port: 443, remote_ip_prefix: "0.0.0.0/0"}
 
+default_appliance_mounts:
+  - { name: "opt", path: "/opt", size: "5000m", fstype: "btrfs" }
+  - { name: "home", path: "/home/{{ appliance_user }}", size: "10000m", fstype: "btrfs" }
+  - { name: "docker", path: "/var/lib/docker", size: "10000m", fstype: "ext4" }
+
+cc_security_groups: "{{ security_groups | default(default_security_groups) }}"
 cc_security_group_names: "{{ cc_security_groups | map(attribute='group') | unique | list }}"
-
-manager_default_server:
-  flavor: c1.c1r4
-  os_image: "{{ cc_default_os_image }}"
-  volume_size_mb: 20048
+appliance_default:
+  flavor: "{{ cc_flavor | default(cc_default_flavor) }}"
+  os_image: "{{ cc_os_image | default(cc_default_os_image) }}"
+  volume_size_mb: "{{ cc_volume_size | default(cc_default_volume_size) }}"
   security_groups: "default,{{ security_group_name }}"
+  mounts: "{{ appliance_mounts | default(default_appliance_mounts) }}"
 
-worker_default_server:
-  flavor: c1.c1r4
-  os_image: "{{ cc_default_os_image }}"
-  volume_size_mb: 20048
-  security_groups: "default,{{ security_group_name }}"
-
-database_server_mounts:  
-  name: 'lib-mysql' 
-  path: '/var/lib/mysql' 
-  size: '5000m' 
-  fstype: 'btrfs' 
 
 env_managers: "{{ groups[env_name] | intersect(groups['manager']) | difference(groups['database'])  }}"
 env_db_managers: "{{ groups[env_name] | intersect(groups['database']) }}"
