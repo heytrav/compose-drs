@@ -16,7 +16,7 @@
         var: appliance_defaults
 
     - include_vars:
-        file: group_vars/database/all.yml
+        dir: 'group_vars/database'
         name: db
 
     - debug:
