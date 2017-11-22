@@ -1,8 +1,6 @@
 ---
-cc_volume_size: "{{ database_volume_size | default('40028') }}"
-cc_flavor: "{{ cc_default_flavor }}"
-cc_os_image: "{{ cc_default_os_image }}"
+cc_volume_size: "{{ database_appliance_volume_size | default('40028') }}"
 appliance_mounts:
-  - { name: "docker", path: "/var/lib/docker", size: "10000m", fstype: "ext4" }
+  - { name: "docker", path: "/var/lib/docker", size: "{{ docker_partition_size | default('10000m') }}", fstype: "ext4" }
   - { name: "mysql", path: "/var/lib/mysql", size: "{{ mysql_partition_size | default('20000m') }}", fstype: "btrfs" }
-  - { name: "home", path: "/home/ubuntu", size: "10000m", fstype: "btrfs" }
+  - { name: "home", path: "/home/{{ cc_ssh_user }}", size: "10000m", fstype: "btrfs" }

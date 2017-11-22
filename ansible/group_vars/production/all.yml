@@ -1,0 +1,4 @@
+---
+database_appliance_volume_size: 110028
+mysql_partition_size: 100000m
+docker_partition_size: 40000m

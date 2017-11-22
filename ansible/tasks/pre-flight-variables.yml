@@ -1,7 +1,7 @@
 
 - name: Setup manager servers
   set_fact:
-    managers: "{{ managers + [ {'name': item, 'ip': hostvars[item].fixed_ip} | combine(manager_default_server, recursive=True)   ] }}"
+    managers: "{{ managers + [ {'name': item, 'ip': hostvars[item].fixed_ip} | combine(appliance_default, recursive=True)   ] }}"
   with_items: "{{ env_managers }}"
 
 - name: Add db managers to set of managers

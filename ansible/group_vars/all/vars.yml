@@ -35,12 +35,12 @@ default_security_groups:
   - {group: "{{ security_group_name }}", port: 443, remote_ip_prefix: "0.0.0.0/0"}
 
 default_appliance_mounts:
-  - { name: "opt", path: "/opt", size: "5000m", fstype: "btrfs" }
-  - { name: "home", path: "/home/{{ appliance_user }}", size: "10000m", fstype: "btrfs" }
-  - { name: "docker", path: "/var/lib/docker", size: "10000m", fstype: "ext4" }
+  - { name: "home", path: "/home/{{ cc_ssh_user }}", size: "10000m", fstype: "btrfs" }
+  - { name: "docker", path: "/var/lib/docker", size: "{{ docker_partition_size | default('10000m') }}", fstype: "ext4" }
 
 cc_security_groups: "{{ security_groups | default(default_security_groups) }}"
 cc_security_group_names: "{{ cc_security_groups | map(attribute='group') | unique | list }}"
+
 appliance_default:
   flavor: "{{ cc_flavor | default(cc_default_flavor) }}"
   os_image: "{{ cc_os_image | default(cc_default_os_image) }}"
