@@ -6,15 +6,15 @@
 
 - name: Add db managers to set of managers
   set_fact:
-    managers: "{{ managers + [ {'name': item, 'mounts': [database_server_mounts], 'ip': hostvars[item].fixed_ip} | combine(manager_default_server, recursive=True) ] }}"
+    managers: "{{ managers + [ {'name': item, 'volume_size_mb': db.cc_volume_size, 'mounts': db.appliance_mounts, 'ip': hostvars[item].fixed_ip} | combine(appliance_default, recursive=True) ] }}"
   with_items: "{{ env_db_managers }}"
 
 - name: Setup worker servers
   set_fact:
-    workers: "{{ workers + [ {'name': item, 'ip': hostvars[item].fixed_ip} | combine(worker_default_server, recursive=True)] }}"
+    workers: "{{ workers + [ {'name': item, 'ip': hostvars[item].fixed_ip} | combine(appliance_default, recursive=True)] }}"
   with_items: "{{ env_workers }}"
 
-- name: Create list of servers to for Catalyst Cloud
+- name: Create list of servers for Catalyst Cloud
   set_fact:
     cc_servers: "{{ managers + workers }}"
 

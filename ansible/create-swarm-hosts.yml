@@ -9,6 +9,13 @@
     env_name: "staging"
   tasks:
 
+    - include_vars:
+        dir: "group_vars/{{ env_name }}"
+
+    - include_vars:
+        dir: "group_vars/database"
+        name: db
+
     - include: tasks/pre-flight-variables.yml
 
     - include: tasks/cc-create-stack.yml

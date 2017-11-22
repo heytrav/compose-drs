@@ -1,1 +1,6 @@
 ---
+
+- name: Setup manager servers
+  set_fact:
+    managers: "{{ managers + [ {'name': item, 'ip': hostvars[item].fixed_ip} | combine(appliance_default, recursive=True)   ] }}"
+  with_items: "{{ env_managers }}"
