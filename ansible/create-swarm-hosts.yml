@@ -10,7 +10,7 @@
   tasks:
 
     - include_vars:
-        dir: "group_vars/{{ env_name }}"
+        dir: 'group_vars/{{ env_name }}'
 
     - debug:
         var: appliance_defaults
