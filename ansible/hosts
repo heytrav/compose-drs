@@ -24,43 +24,26 @@ worker2-production
 worker3-production
 
 [staging]
-manager1-staging
-manager2-staging
-worker1-staging
-worker2-staging
-worker3-staging
+*-staging
 
 [production]
-manager1-production
-manager2-production
-worker1-production
-worker2-production
-worker3-production
+*-production
 
 [manager]
-manager1-staging
-manager2-staging
-manager1-production
-manager2-production
-
+manager*
 
 [worker]
-worker1-staging
-worker2-staging
-worker3-staging
-worker1-production
-worker2-production
-worker3-production
+worker*
 
 [database]
 manager2-staging
 manager2-production
 
 [primary_manager]
-manager1-staging
-manager1-production
+manager1-*
+manager1-*
 
 
 [gitlab]
-gitlab-runner1
+gitlab-*
 
