@@ -60,6 +60,17 @@
   tasks:
     - include: roles/common/tasks/install-python.yml
 
+- name: Basic host setup
+  hosts: "{{ env_name }}"
+  become: true
+  roles: [catalystcloud]
+  gather_facts: true
+  tasks:
+    - name: Create cc_servers list
+      set_fact:
+        cc_servers: "{{ [{'name': '{{ appliance_name }}', 'ip': '{{ hostvars[ansible_hostname].ansible_host }}'} | combine(appliance_default, recursive=True)] }}"
+
+    - include: roles/catalystcloud/tasks/setup-lvm.yml
 
 - name: Install Docker on swarm hosts
   hosts: "{{ env_name }}"
