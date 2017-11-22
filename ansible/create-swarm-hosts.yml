@@ -12,8 +12,11 @@
     - include_vars:
         dir: "group_vars/{{ env_name }}"
 
+    - debug:
+        var: appliance_defaults
+
     - include_vars:
-        dir: "group_vars/database"
+        file: group_vars/database/all.yml
         name: db
 
     - debug:
