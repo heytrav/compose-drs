@@ -12,15 +12,9 @@
     - include_vars:
         dir: 'group_vars/{{ env_name }}'
 
-    - debug:
-        var: appliance_default
-
     - include_vars:
         dir: 'group_vars/database'
         name: db
-
-    - debug:
-        var: db
 
     - include: tasks/pre-flight-variables.yml
 
