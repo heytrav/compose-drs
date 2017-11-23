@@ -17,7 +17,7 @@ cc_default_flavor: c1.c1r1
 cc_ssh_user: ubuntu
 cc_volume_device_name: /dev/vdb
 cc_volume_group_name: data
-cc_default_volume_size: 20048
+cc_default_volume_size: 15048
 managers: []
 workers: []
 cc_floating_ips: []
@@ -35,7 +35,6 @@ default_security_groups:
   - {group: "{{ security_group_name }}", port: 443, remote_ip_prefix: "0.0.0.0/0"}
 
 default_appliance_mounts:
-  - { name: "home", path: "/home/{{ cc_ssh_user }}", size: "10000m", fstype: "btrfs" }
   - { name: "docker", path: "/var/lib/docker", size: "{{ docker_partition_size | default('10000m') }}", fstype: "ext4" }
 
 cc_security_groups: "{{ security_groups | default(default_security_groups) }}"
@@ -44,7 +43,7 @@ cc_security_group_names: "{{ cc_security_groups | map(attribute='group') | uniqu
 appliance_default:
   flavor: "{{ cc_flavor | default(cc_default_flavor) }}"
   os_image: "{{ cc_os_image | default(cc_default_os_image) }}"
-  volume_size_mb: "{{ cc_volume_size | default(cc_default_volume_size) }}"
+  volume_size_mb: "{{ cc_default_volume_size }}"
   security_groups: "default,{{ security_group_name }}"
   mounts: "{{ appliance_mounts | default(default_appliance_mounts) }}"
 

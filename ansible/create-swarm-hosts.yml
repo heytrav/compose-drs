@@ -11,10 +11,14 @@
 
     - include_vars:
         dir: 'group_vars/{{ env_name }}'
+        ignore_files:
+          - .vars.yml.swp
 
     - include_vars:
         dir: 'group_vars/database'
         name: db
+        ignore_files:
+          - .all.yml.swp
 
     - include: tasks/pre-flight-variables.yml
 
@@ -68,7 +72,7 @@
   tasks:
     - name: Create cc_servers list
       set_fact:
-        cc_servers: "{{ [{'name': '{{ appliance_name }}', 'ip': '{{ hostvars[ansible_hostname].ansible_host }}'} | combine(appliance_default, recursive=True)] }}"
+        cc_servers: "{{ [{'name': '{{ ansible_hostname }}', 'ip': '{{ hostvars[ansible_hostname].ansible_host }}'} | combine(appliance_default, recursive=True)] }}"
 
     - include: roles/catalystcloud/tasks/setup-lvm.yml
 
@@ -87,7 +91,6 @@
         name: en_NZ.UTF-8
         state: present
 
-  post_tasks:
     - name: Add entry to /etc/hosts for all instances
       lineinfile:
         dest: /etc/hosts
@@ -152,3 +155,15 @@
       ignore_errors: true
       changed_when: "'node joined a swarm' in worker_join_result.stdout"
       failed_when: "worker_join_result.rc == 1 and 'node is already part of a swarm' not in worker_join_result.stderr"
+
+- name: Set labels on db nodes
+  hosts: "primary_manager:&{{ env_name }}"
+  tags: 
+    - swarm 
+    - init
+    - labels
+  tasks:
+    - name: Set db nodes with database role
+      command: docker node update --label-add role=database {{ item }}
+      with_items: "{{ env_db_managers }}"
+        

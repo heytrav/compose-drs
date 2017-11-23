@@ -5,6 +5,17 @@
   vars:
     env_name: "staging"
   tasks:
+    - include_vars:
+        dir: 'group_vars/{{ env_name }}'
+        ignore_files:
+          - .vars.yml.swp
+
+    - include_vars:
+        dir: 'group_vars/database'
+        name: db
+        ignore_files:
+          - .all.yml.swp
+
     - include: tasks/pre-flight-variables.yml
 
     - name: Connect to Catalyst Cloud
