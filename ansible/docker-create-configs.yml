@@ -27,7 +27,7 @@
       register: existing_configs
 
     - name: Generate nodepp json config files
-      include: ./epp-config.yml
+      include: tasks/epp-config.yml
       vars:
         epp_service_config: "{{ configs[item]  }}"
         epp_config_name: "{{ item }}"

@@ -1,6 +1,6 @@
 ---
 - name: Docker stack configuration
-  hosts: manager
+  hosts: "primary_manager:&{{ env_name }}"
   tasks:
     - name: Gather list of docker secrets
       set_fact:
@@ -34,7 +34,7 @@
         known_configs: []
 
     - name: Load known configs for stack
-      include: ./load-drs-configs.yml
+      include: tasks/load-drs-configs.yml
       vars:
         service_config: "{{ item.value  }}"
         service_name: "{{ item.key }}"

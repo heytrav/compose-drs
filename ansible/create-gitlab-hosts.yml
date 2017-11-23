@@ -24,7 +24,7 @@
     - name: Add newly created hosts to local ~/.ssh/config
       tags: local-changes
       blockinfile:
-        dest: "{{ ansible_env.HOME }}/.ssh/config"
+        dest: "{{ base_directory }}/.ssh/config"
         insertbefore: BOF
         block: |
           Host {{ hostvars[item.name].ansible_host }}

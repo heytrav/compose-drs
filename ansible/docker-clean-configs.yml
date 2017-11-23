@@ -1,7 +1,7 @@
 # To be run exclusively for creating/updating docker configs
 ---
 - name: Clean-up unused docker configs
-  hosts: manager
+  hosts: "primary_manager:&{{ env_name }}"
   tasks:
 
     - name: Register existing docker configs
@@ -13,7 +13,7 @@
         known_configs: []
 
     - name: Load known configs for stack
-      include: ./load-drs-configs.yml
+      include: tasks/load-drs-configs.yml
       vars:
         service_config: "{{ item.value  }}"
         service_name: "{{ item.key }}"

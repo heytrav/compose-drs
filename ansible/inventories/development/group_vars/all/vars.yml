@@ -1,6 +1,5 @@
 ---
 
-base_directory: ~/workspace/innovation/compose-drs
 sentry_environment: development
 
 services:

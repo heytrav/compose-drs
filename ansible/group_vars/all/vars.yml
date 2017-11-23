@@ -52,7 +52,6 @@ cocca_secrets:
   - cocca_test_password
   - cocca_test_config
   - nodepp_sentry_dsn
-  - logzio_token
   - rabbitmq_default_user
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
@@ -79,7 +78,6 @@ centralnic_secrets:
   - centralnic_test_password
   - centralnic_test_config
   - nodepp_sentry_dsn
-  - logzio_token
   - rabbitmq_default_user
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
@@ -108,7 +106,6 @@ nzrs_secrets:
   - nodepp_sentry_dsn
   - nzrs-epp.pem
   - nzrs-epp.key
-  - logzio_token
   - rabbitmq_default_user
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
@@ -161,7 +158,6 @@ celery_environment:
   MYSQL_DATABASE_FILE: /run/secrets/mysql_database
   DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
   JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
-  LOGZIO_TOKEN_FILE: /run/secrets/logzio_token
 celery_secrets:
   - mysql_database
   - mysql_user
@@ -169,7 +165,6 @@ celery_secrets:
   - celery_sentry_dsn
   - django_secret_key
   - jwt_secret_key
-  - logzio_token
   - rabbitmq_default_user
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
@@ -186,7 +181,6 @@ api_environment:
   MYSQL_DATABASE_FILE: /run/secrets/mysql_database
   DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
   JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
-  LOGZIO_TOKEN_FILE: /run/secrets/logzio_token
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
@@ -203,7 +197,6 @@ api_secrets:
   - domain_api_sentry_dsn
   - django_secret_key
   - jwt_secret_key
-  - logzio_token
   - rabbitmq_default_user
   - rabbitmq_default_pass
   - rabbitmq_erlang_cookie
@@ -282,8 +275,6 @@ docker_secrets:
     external: true
   nzrs-epp.key:
     external: true
-  logzio_token:
-    external: true 
   rabbitmq_default_user:
     external: true
   rabbitmq_default_pass:
