@@ -15,7 +15,7 @@
 # file so that ansible notices a change and notifies the handler.
 ---
 - name: Docker stack configuration
-  hosts: manager
+  hosts: "primary_manager:&{{ env_name }}"
   tasks:
 
     - name: Initialize list of known configs
