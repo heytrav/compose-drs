@@ -18,8 +18,6 @@ cc_ssh_user: ubuntu
 cc_volume_device_name: /dev/vdb
 cc_volume_group_name: data
 cc_default_volume_size: 15048
-managers: []
-workers: []
 cc_floating_ips: []
 region_nameservers:
   nz-por-1: [202.78.247.197, 202.78.247.198, 202.78.247.199]
@@ -47,9 +45,3 @@ appliance_default:
   security_groups: "default,{{ security_group_name }}"
   mounts: "{{ appliance_mounts | default(default_appliance_mounts) }}"
 
-
-env_managers: "{{ groups[env_name] | intersect(groups['manager']) | difference(groups['database'])  }}"
-env_db_managers: "{{ groups[env_name] | intersect(groups['database']) }}"
-env_workers: "{{ groups[env_name] | intersect(groups['worker']) }}"
-
-primary_manager: "{{ groups['primary_manager'] | intersect(groups[env_name]) | first }}"

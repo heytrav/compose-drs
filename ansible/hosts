@@ -19,6 +19,12 @@ worker[1:3]-staging
 manager[1:2]-production
 worker[1:3]-production
 
+[catalystcloud]
+manager[1:2]-staging
+worker[1:3]-staging
+manager[1:2]-production
+worker[1:3]-production
+
 [development]
 localhost
 
@@ -36,6 +42,7 @@ staging
 development
 
 [manager]
+localhost
 manager[1:2]-staging
 manager[1:2]-production
 
@@ -55,5 +62,3 @@ manager1-production
 
 [gitlab]
 gitlab-runner1
-
-
