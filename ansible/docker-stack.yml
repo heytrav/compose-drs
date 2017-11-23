@@ -41,14 +41,14 @@
       with_dict: "{{ configs }}"
 
     - name: Create docker compose spec
+      template:
+        src: templates/drs-stack.yml.j2
+        dest: "{{ base_directory  }}/drs-stack.yml"
       notify:
         - deploy stack
         - nodepp version
         - api version
         - celery version
-      template:
-        src: templates/drs-stack.yml.j2
-        dest: "{{ base_directory  }}/drs-stack.yml"
         
 
 
