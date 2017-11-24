@@ -1,5 +1,6 @@
 ---
 cc_ssh_user: "{{ lookup('env', 'USER') }}"
+base_directory: ~/workspace/innovation/compose-drs
 sentry_environment: development
 
 swarm_init_extra_args: "--advertise-addr {{ ansible_default_ipv6.address }}" 
