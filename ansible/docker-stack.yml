@@ -49,8 +49,6 @@
         - nodepp version
         - api version
         - celery version
-        
-
 
   handlers:
     - name: deploy stack

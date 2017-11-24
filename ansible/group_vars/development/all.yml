@@ -1,6 +1,8 @@
 ---
-
+cc_ssh_user: "{{ lookup('env', 'USER') }}"
 sentry_environment: development
+
+swarm_init_extra_args: "--advertise-addr {{ ansible_default_ipv6.address }}" 
 
 services:
   rabbitmq: "{{ rabbitmq_service }}" 

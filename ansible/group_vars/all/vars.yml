@@ -2,7 +2,7 @@
 managers: []
 workers: []
 
-env_managers: "{{ groups[env_name] | intersect(groups['manager']) | difference(groups['database'])  }}"
+env_managers: "{{ groups[env_name] | intersect(groups['manager']) | intersect(groups['catalystcloud']) | difference(groups['database'])  }}"
 env_db_managers: "{{ groups[env_name] | intersect(groups['database']) }}"
 env_workers: "{{ groups[env_name] | intersect(groups['worker']) }}"
 

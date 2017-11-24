@@ -13,6 +13,7 @@
         dir: 'group_vars/{{ env_name }}'
         ignore_files:
           - .vars.yml.swp
+          - .all.yml.swp
 
     - include_vars:
         dir: 'group_vars/database'
@@ -23,6 +24,7 @@
     - include: tasks/pre-flight-variables.yml
 
     - include: tasks/cc-create-stack.yml
+      when: "'development' not in group_names"
 
 
     - name: Add newly created hosts to local ~/.ssh/config
@@ -65,7 +67,7 @@
     - include: roles/common/tasks/install-python.yml
 
 - name: Basic host setup
-  hosts: "{{ env_name }}"
+  hosts: "{{ env_name }}:&catalystcloud"
   become: true
   roles: [catalystcloud]
   gather_facts: true
@@ -103,10 +105,12 @@
     - swarm 
     - init
   tasks:
-    - name: Initiate swarm on host
-      command: docker swarm init
+    - debug:
+        var: swarm_init_extra_args
+
+    - name: Initiate swarm on host 
+      command: docker swarm init {{ swarm_init_extra_args | d() }}
       register: swarm_init_result
-      ignore_errors: true
       changed_when: "'Swarm initialized' in swarm_init_result.stdout"
       failed_when: "swarm_init_result.rc == 1 and 'node is already part of a swarm' not in swarm_init_result.stderr"
 

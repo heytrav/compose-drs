@@ -57,7 +57,7 @@
   notify:
     - start docker
 
-- name: Add "{{ cc_ssh_user }}"  user to docker group
+- name: "Add {{ cc_ssh_user }}  user to docker group"
   user:
     name: "{{ cc_ssh_user }}"
     append: yes
