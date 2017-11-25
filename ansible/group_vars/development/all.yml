@@ -5,56 +5,34 @@ sentry_environment: development
 
 swarm_init_extra_args: "--advertise-addr {{ ansible_default_ipv6.address }}" 
 
-services:
-  rabbitmq: "{{ rabbitmq_service }}" 
-  domaindb: "{{ domaindb_service }}" 
-  nginx: "{{ nginx_service  }}"
-  memcached: "{{ memcached_service  }}"
-  migrate: "{{ migrate_service  }}"
-  celery: "{{ celery_service  }}"
-  api: "{{ api_service  }}"
-  cocca: "{{ cocca_service  }}"
-  centralnic: "{{ centralnic_service }}"
+api_image: "quay.io/heytrav/domain-api:{{ api_version }}"
+api_version: 1.2.22
+nodepp_image: "quay.io/heytrav/nodepp:{{ nodepp_version }}"
+nodepp_version: 1.2.8
 
-service_volumes:
-  cocca:
-    volumes:
-      - ../nodepp:/opt/project/node-epp
-  centralnic:
-    volumes:
-      - ../nodepp:/opt/project/node-epp
+services_supplement:
+  cocca: "{{ cocca }}"
+  centralnic: "{{ centralnic }}"
+
+
+volumes_supplement:
+  api: 
+    volumes: "{{ api_volumes }}"
+  celery:
+    volumes: "{{ api_volumes }}"
+  migrate: 
+    volumes: "{{ api_volumes }}"
+  cocca: 
+    volumes: "{{ nodepp_volumes }}"
+  centralnic: 
+    volumes: "{{ nodepp_volumes }}"
   domaindb:
     volumes:
       - ../database/mysql:/var/lib/mysql
-  api:
-    volumes:
-      - ../drs-project:/usr/local/domain-api
 
-cocca_deploy:
-  replicas: 1
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause
-centralnic_deploy:
-  replicas: 1
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause
-nzrs_deploy:
-  replicas: 1
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause
+  
+api_volumes:
+  - ../drs-project:/usr/local/domain-api
 
+nodepp_volumes:
+  - ../nodepp:/opt/project/node-epp

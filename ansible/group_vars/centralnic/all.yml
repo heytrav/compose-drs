@@ -1,0 +1,71 @@
+---
+centralnic:
+  image: "{{ nodepp_image }}"
+  command: "{{ centralnic_command }}"
+  configs:
+    - source: centralnic-4
+      target: /centralnic-epp.json
+  depends_on:
+  - rabbitmq
+  deploy:
+    replicas: 1
+    restart_policy:
+      condition: on-failure
+      delay: 10s
+    update_config:
+      delay: 5s
+      failure_action: pause
+      parallelism: 1
+  environment:
+    EPP_LOGIN_FILE: /run/secrets/centralnic_login
+    EPP_PASSWORD_FILE: /run/secrets/centralnic_password
+    RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+    RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+    RABBITMQ_DEFAULT_VHOST: /
+    RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_PORT: 5672
+    RELEASE_VERSION: "{{ nodepp_version }}"
+    SENTRY_DSN_FILE: /run/secrets/nodepp_sentry_dsn
+  healthcheck:
+    interval: 1m
+    retries: 3
+    test: "{{ centralnic_healthcheck }}"
+    timeout: 20s
+  secrets:
+    - centralnic_login
+    - centralnic_password
+    - nodepp_sentry_dsn
+    - rabbitmq_default_user
+    - rabbitmq_default_pass
+
+
+centralnic_config:
+  name: centralnic
+  services: 
+    - centralnic
+  file: centralnic-epp.json
+  compose:
+    target: /centralnic-epp.json
+  version: 4
+  config:
+    host: "{{ centralnic_epp_server }}" 
+    port: "{{ centralnic_epp_port }}"
+    ssl: true
+    services: "{{ centralnic_epp_services }}"
+    extensions:
+      - DNSSEC
+    extensionClasses:
+      - extension: DNSSEC
+        className: SecDnsExtension 
+    namespaces:
+      epp:
+        xmlns: urn:ietf:params:xml:ns:epp-1.0
+      domain:
+        xmlns: urn:ietf:params:xml:ns:domain-1.0
+      contact:
+        xmlns: urn:ietf:params:xml:ns:contact-1.0
+      host:
+        xmlns: urn:ietf:params:xml:ns:host-1.0 
+      DNSSEC:
+        xmlns: urn:ietf:params:xml:ns:secDNS-1.1

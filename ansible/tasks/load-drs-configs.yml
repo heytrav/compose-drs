@@ -16,6 +16,6 @@
   with_items: "{{ service_config.services }}"
   loop_control:
     loop_var: config_item
-  include: ./append-compose-config.yml
+  include: tasks/append-compose-config.yml
   when: config_item in services
 

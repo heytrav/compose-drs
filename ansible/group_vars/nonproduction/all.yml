@@ -1,0 +1,29 @@
+
+api_command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+celery_command: ["celery", "-A", "application", "worker", "-l", "info"]
+cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca-test", "--loglevel", "debug"]
+cocca_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca-test", "--loglevel", "debug"]
+centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic-test", "--loglevel", "debug"]
+centralnic_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic-test", "--loglevel", "debug"]
+nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs-test", "--loglevel", "debug"]
+nzrs_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs-test", "--loglevel", "debug"]
+
+nzrs_epp_server: srstestepp.srs.net.nz 
+nzrs_epp_port: 700
+nzrs_epp_services:
+  - domain
+  - contact
+
+cocca_epp_server: ote.coccaregistry.org
+cocca_epp_port: 700
+cocca_epp_services:
+  - domain
+  - contact
+  - host
+
+centralnic_epp_server: epp-ote.centralnic.com
+centralnic_epp_port: 700
+centralnic_epp_services:
+  - domain
+  - contact
+  - host

@@ -45,8 +45,8 @@ cocca_healthcheck:
   timeout: 20s
   retries: 3
 cocca_environment:
-  EPP_LOGIN_FILE: /run/secrets/cocca_test_login
-  EPP_PASSWORD_FILE: /run/secrets/cocca_test_password
+  EPP_LOGIN_FILE: /run/secrets/cocca_login
+  EPP_PASSWORD_FILE: /run/secrets/cocca_password
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
@@ -56,9 +56,8 @@ cocca_environment:
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
   RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
 cocca_secrets:
-  - cocca_test_login
-  - cocca_test_password
-  - cocca_test_config
+  - cocca_login
+  - cocca_password
   - nodepp_sentry_dsn
   - rabbitmq_default_user
   - rabbitmq_default_pass
@@ -71,8 +70,8 @@ centralnic_healthcheck:
   timeout: 20s
   retries: 3
 centralnic_environment:
-  EPP_LOGIN_FILE: /run/secrets/centralnic_test_login
-  EPP_PASSWORD_FILE: /run/secrets/centralnic_test_password
+  EPP_LOGIN_FILE: /run/secrets/centralnic_login
+  EPP_PASSWORD_FILE: /run/secrets/centralnic_password
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
@@ -82,9 +81,8 @@ centralnic_environment:
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
   RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
 centralnic_secrets:
-  - centralnic_test_login
-  - centralnic_test_password
-  - centralnic_test_config
+  - centralnic_login
+  - centralnic_password
   - nodepp_sentry_dsn
   - rabbitmq_default_user
   - rabbitmq_default_pass
@@ -97,8 +95,8 @@ nzrs_healthcheck:
   timeout: 20s
   retries: 3
 nzrs_environment:
-  EPP_LOGIN_FILE: /run/secrets/nzrs_test_login
-  EPP_PASSWORD_FILE: /run/secrets/nzrs_test_password
+  EPP_LOGIN_FILE: /run/secrets/nzrs_login
+  EPP_PASSWORD_FILE: /run/secrets/nzrs_password
   RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
   RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
   RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
@@ -108,9 +106,8 @@ nzrs_environment:
   RABBITMQ_PORT: "{{ rabbitmq_port  }}"
   RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_default_vhost  }}"
 nzrs_secrets:
-  - nzrs_test_login
-  - nzrs_test_password
-  - nzrs_test_config
+  - nzrs_login
+  - nzrs_password
   - nodepp_sentry_dsn
   - nzrs-epp.pem
   - nzrs-epp.key
@@ -134,6 +131,7 @@ rabbitmq_secrets:
 domaindb_environment:
   MYSQL_USER_FILE: /run/secrets/mysql_user
   MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+  MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
   MYSQL_DATABASE_FILE: /run/secrets/mysql_database
 domaindb_secrets:
   - mysql_password
@@ -239,17 +237,13 @@ memcached_deploy:
       memory: 64M
         
 docker_secrets:
-  cocca_test_login:
+  cocca_login:
     external: true
-  cocca_test_password:
+  cocca_password:
     external: true
-  cocca_test_config:
+  centralnic_login:
     external: true
-  centralnic_test_login:
-    external: true
-  centralnic_test_password:
-    external: true
-  centralnic_test_config:
+  centralnic_password:
     external: true
   mysql_root_password:
     external: true
@@ -273,11 +267,9 @@ docker_secrets:
     external: true
   jwt_secret_key:
     external: true
-  nzrs_test_login:
+  nzrs_login:
     external: true
-  nzrs_test_password:
-    external: true
-  nzrs_test_config:
+  nzrs_password:
     external: true
   nzrs-epp.pem:
     external: true
@@ -290,9 +282,9 @@ docker_secrets:
   rabbitmq_erlang_cookie:
     external: true
 
-nodepp_sentry_webhook_url: vault_nodepp_sentry_webhook_url
-api_sentry_webhook_url: vault_api_sentry_webhook_url
-celery_sentry_webhook_url: vault_celery_sentry_webhook_url
+nodepp_sentry_webhook_url: "{{ vault_nodepp_sentry_webhook_url }}" 
+api_sentry_webhook_url: "{{ vault_api_sentry_webhook_url }}"
+celery_sentry_webhook_url: "{{ vault_celery_sentry_webhook_url }}"
 
 
 migrate_service:
@@ -325,11 +317,14 @@ celery_service:
   secrets: "{{ celery_secrets }}"
   depends_on:
     - rabbitmq
+    - domaindb
 nginx_service:
   image: "{{ images.nginx.image  }}:{{ images.nginx.tag  }}"
   deploy: "{{  nginx_deploy  }}"
   ports: "{{ nginx_ports }}"
   secrets: "{{ nginx_secrets }}"
+  depends_on:
+    - api
 domaindb_service:
   image: "{{ images.domaindb.image  }}:{{ images.domaindb.tag  }}"
   environment: "{{domaindb_environment }}"
@@ -389,98 +384,3 @@ configs:
     version: 1
     compose:
       target: /etc/nginx/conf.d/site.conf
-  centralnic:
-    name: centralnic-test
-    services: 
-      - centralnic
-    file: centralnic-epp.json
-    compose:
-      target: /centralnic-epp.json
-    version: 4
-    config:
-      host: epp-ote.centralnic.com
-      port: 700
-      ssl: true
-      services:
-        - domain
-        - contact
-        - host
-      extensions:
-        - DNSSEC
-      extensionClasses:
-        - extension: DNSSEC
-          className: SecDnsExtension 
-      namespaces:
-        epp:
-          xmlns: urn:ietf:params:xml:ns:epp-1.0
-        domain:
-          xmlns: urn:ietf:params:xml:ns:domain-1.0
-        contact:
-          xmlns: urn:ietf:params:xml:ns:contact-1.0
-        host:
-          xmlns: urn:ietf:params:xml:ns:host-1.0 
-        DNSSEC:
-          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
-  cocca:
-    name: cocca-test
-    services:
-      - cocca
-    file: cocca-epp.json
-    version: 4
-    compose:
-      target: /cocca-epp.json
-    config:
-      host: ote.coccaregistry.org
-      port: 700
-      ssl: true
-      services:
-        - domain
-        - contact
-        - host
-      extensions:
-        - DNSSEC
-      extensionClasses:
-        - extension: DNSSEC
-          className: SecDnsExtension 
-      namespaces:
-        epp:
-          xmlns: urn:ietf:params:xml:ns:epp-1.0
-        domain:
-          xmlns: urn:ietf:params:xml:ns:domain-1.0
-        contact:
-          xmlns: urn:ietf:params:xml:ns:contact-1.0
-        host:
-          xmlns: urn:ietf:params:xml:ns:host-1.0 
-        DNSSEC:
-          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
-  nzrs:
-    name: nzrs-test
-    services:
-      - nzrs
-    file: nzrs-epp.json
-    compose:
-      target: /nzrs-epp.json
-    version: 4
-    config:
-      host: srstestepp.srs.net.nz
-      cert: /run/secrets/nzrs-epp.pem
-      key: /run/secrets/nzrs-epp.key
-      port: 700
-      ssl: true
-      services:
-        - domain
-        - contact
-      extensions:
-        - DNSSEC
-      extensionClasses:
-        - extension: DNSSEC
-          className: SecDnsExtension 
-      namespaces:
-        epp:
-          xmlns: urn:ietf:params:xml:ns:epp-1.0
-        domain:
-          xmlns: urn:ietf:params:xml:ns:domain-1.0
-        contact:
-          xmlns: urn:ietf:params:xml:ns:contact-1.0
-        DNSSEC:
-          xmlns: urn:ietf:params:xml:ns:secDNS-1.1

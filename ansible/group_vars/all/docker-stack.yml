@@ -1,0 +1,187 @@
+rabbitmq_image:  rabbitmq:3.6-management-alpine
+nginx_image: nginx:stable-alpine
+mysql_image: mysql:latest
+memcached_image: memcached:alpine
+
+
+version: "3.3"
+services:
+  migrate:
+    image: "{{ api_image }}"
+    command: ["python3", "manage.py", "migrate"]
+    depends_on:
+      - domaindb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 1
+    environment:
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      MYSQL_HOST: domaindb
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+      RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RELEASE_VERSION: "{{ api_version }}"
+      SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
+      SENTRY_ENVIRONMENT: development
+    secrets:
+      - mysql_database
+      - mysql_user
+      - mysql_password
+      - domain_api_sentry_dsn
+      - django_secret_key
+      - jwt_secret_key
+      - rabbitmq_default_user
+      - rabbitmq_default_pass
+      - rabbitmq_erlang_cookie
+
+  rabbitmq:
+    image: "{{ rabbitmq_image }}"
+    deploy:
+      resources:
+        limits:
+          memory: 1048M
+    environment:
+      RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+      RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 0.49
+    ports:
+      - 15672:15672
+    secrets:
+      - rabbitmq_default_user
+      - rabbitmq_default_pass
+      - rabbitmq_erlang_cookie
+
+  celery:
+    image: "{{ api_image }}"
+    command: "{{ celery_command }}"
+    depends_on:
+      - rabbitmq
+      - domaindb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+    environment:
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      MYSQL_HOST: domaindb
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+      RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RELEASE_VERSION: "{{ api_version }}"
+      SENTRY_DSN_FILE: /run/secrets/celery_sentry_dsn
+      SENTRY_ENVIRONMENT: development
+    secrets:
+      - mysql_database
+      - mysql_user
+      - mysql_password
+      - celery_sentry_dsn
+      - django_secret_key
+      - jwt_secret_key
+      - rabbitmq_default_user
+      - rabbitmq_default_pass
+      - rabbitmq_erlang_cookie
+
+  nginx:
+    configs:
+      - source: nginx-1
+        target: /etc/nginx/conf.d/site.conf
+    depends_on:
+      - api
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+    image: "{{ nginx_image }}"
+    ports:
+      - 443:443
+    secrets:
+      - site.key
+      - site.crt
+
+  domaindb:
+    image: "{{ mysql_image }}"
+    environment:
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+    ports:
+      - 3306:3306
+    secrets:
+      - mysql_password
+      - mysql_root_password
+      - mysql_database
+      - mysql_user
+
+  memcached:
+    image: "{{ memcached_image }}"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+        reservations:
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+
+  api:
+    image: "{{ api_image }}"
+    command: "{{ api_command }}"
+    depends_on:
+      - rabbitmq
+      - domaindb
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+      update_config:
+        delay: 5s
+        failure_action: pause
+        parallelism: 1
+    environment:
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      MYSQL_HOST: domaindb
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+      RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+      RABBITMQ_DEFAULT_VHOST: /
+      RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RELEASE_VERSION: "{{ api_version }}"
+      SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
+      SENTRY_ENVIRONMENT: development
+    secrets:
+      - mysql_database
+      - mysql_user
+      - mysql_password
+      - domain_api_sentry_dsn
+      - django_secret_key
+      - jwt_secret_key
+      - rabbitmq_default_user
+      - rabbitmq_default_pass
+      - rabbitmq_erlang_cookie
