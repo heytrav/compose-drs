@@ -5,7 +5,7 @@ memcached_image: memcached:alpine
 
 
 version: "3.3"
-services:
+core_services:
   migrate:
     image: "{{ api_image }}"
     command: ["python3", "manage.py", "migrate"]

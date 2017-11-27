@@ -1,30 +1,36 @@
 ---
-nzrs_config:
-  name: nzrs
-  services:
-    - nzrs
-  file: nzrs-epp.json
-  compose:
-    target: /nzrs-epp.json
-  version: 4
+nzrs:
+  secrets:
+    nzrs_login: "{{ vault_nzrs_login }}"
+    nzrs_password: "{{ vault_nzrs_password }}"
+    nzrs-epp.pem: "{{ vault_nzrs_epp_pem }}"
+    nzrs-epp.key: "{{ vault_nzrs_epp_key }}"
   config:
-    host: "{{ nzrs_epp_server }}"
-    cert: /run/secrets/nzrs-epp.pem
-    key: /run/secrets/nzrs-epp.key
-    port: "{{ nzrs_epp_port }}"
-    ssl: true
-    services: "{{ nzrs_epp_services }}"
-    extensions:
-      - DNSSEC
-    extensionClasses:
-      - extension: DNSSEC
-        className: SecDnsExtension 
-    namespaces:
-      epp:
-        xmlns: urn:ietf:params:xml:ns:epp-1.0
-      domain:
-        xmlns: urn:ietf:params:xml:ns:domain-1.0
-      contact:
-        xmlns: urn:ietf:params:xml:ns:contact-1.0
-      DNSSEC:
-        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+    name: nzrs
+    services:
+      - nzrs
+    file: nzrs-epp.json
+    compose:
+      target: /nzrs-epp.json
+    version: 4
+    config:
+      host: "{{ nzrs_epp_server }}"
+      cert: /run/secrets/nzrs-epp.pem
+      key: /run/secrets/nzrs-epp.key
+      port: "{{ nzrs_epp_port }}"
+      ssl: true
+      services: "{{ nzrs_epp_services }}"
+      extensions:
+        - DNSSEC
+      extensionClasses:
+        - extension: DNSSEC
+          className: SecDnsExtension 
+      namespaces:
+        epp:
+          xmlns: urn:ietf:params:xml:ns:epp-1.0
+        domain:
+          xmlns: urn:ietf:params:xml:ns:domain-1.0
+        contact:
+          xmlns: urn:ietf:params:xml:ns:contact-1.0
+        DNSSEC:
+          xmlns: urn:ietf:params:xml:ns:secDNS-1.1

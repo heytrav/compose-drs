@@ -10,12 +10,22 @@ api_version: 1.2.22
 nodepp_image: "quay.io/heytrav/nodepp:{{ nodepp_version }}"
 nodepp_version: 1.2.8
 
-services_supplement:
-  cocca: "{{ cocca }}"
-  centralnic: "{{ centralnic }}"
+epp_services:
+  cocca: "{{ cocca.service }}"
+  centralnic: "{{ centralnic.service }}"
 
+epp_configs:
+  cocca: "{{ cocca.config }}"
+  centralnic: "{{ centralnic.config }}"
 
-volumes_supplement:
+epp_secrets: "{{ {} | combine(cocca.secrets, recursive=True) | combine(centralnic.secrets, recursive=True) }}"
+
+api_volumes:
+  - ../drs-project:/usr/local/domain-api
+nodepp_volumes:
+  - ../nodepp:/opt/project/node-epp
+
+volumes:
   api: 
     volumes: "{{ api_volumes }}"
   celery:
@@ -29,10 +39,3 @@ volumes_supplement:
   domaindb:
     volumes:
       - ../database/mysql:/var/lib/mysql
-
-  
-api_volumes:
-  - ../drs-project:/usr/local/domain-api
-
-nodepp_volumes:
-  - ../nodepp:/opt/project/node-epp
