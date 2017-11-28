@@ -3,6 +3,7 @@ centralnic:
   service:
     image: "{{ nodepp_image }}"
     command: "{{ centralnic_command }}"
+    configs: {{  }}
     depends_on:
       - rabbitmq
     deploy:
@@ -40,7 +41,7 @@ centralnic:
     centralnic_login: "{{ vault_centralnic_login }}"
     centralnic_password: "{{ vault_centralnic_password }}"
   config:
-    #name: centralnic
+    name: centralnic-1
     services: 
       - centralnic
     file: centralnic-epp.json

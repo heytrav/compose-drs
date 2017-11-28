@@ -2,12 +2,9 @@
 - name: Docker stack configuration
   hosts: "primary_manager:&{{ env_name }}"
   tasks:
-    - set_fact:
-        services: "{{ services | combine(services_supplement, recursive=True) }}"
-    - set_fact:
-        services: "{{ services | combine(volumes_supplement, recursive=True) }}"
+
     - debug:
-        var: services
+        var: service_secrets
     #- name: Gather list of docker secrets
       #set_fact:
         #known_secrets: "{{ api_secrets + nginx_secrets + celery_secrets + domaindb_secrets  }}"
