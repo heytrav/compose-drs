@@ -1,0 +1,12 @@
+---
+memcached_service:
+  image: "{{ memcached_image }}"
+  deploy:
+    resources:
+      limits:
+        memory: 64M
+      reservations:
+        memory: 64M
+    restart_policy:
+      condition: on-failure
+      delay: 10s

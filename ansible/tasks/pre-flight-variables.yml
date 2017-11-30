@@ -2,6 +2,19 @@
 - debug:
     var: db
 
+- debug:
+    var: appliance_default
+
+
+- debug:
+    var: managers 
+
+- debug:
+    var: env_managers 
+
+- debug: 
+    var:  hostvars['manager1-staging'] 
+
 - name: Setup manager servers
   set_fact:
     managers: "{{ managers + [ appliance_default | combine({'name': item, 'ip': hostvars[item].fixed_ip}, recursive=True)   ] }}"

@@ -1,12 +1,12 @@
 
 api_command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 celery_command: ["celery", "-A", "application", "worker", "-l", "info"]
-cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca-test", "--loglevel", "debug"]
-cocca_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca-test", "--loglevel", "debug"]
-centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic-test", "--loglevel", "debug"]
-centralnic_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic-test", "--loglevel", "debug"]
-nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs-test", "--loglevel", "debug"]
-nzrs_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs-test", "--loglevel", "debug"]
+cocca_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca", "--loglevel", "debug"]
+cocca_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/cocca-epp.json", "-r", "cocca", "--loglevel", "debug"]
+centralnic_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic", "--loglevel", "debug"]
+centralnic_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/centralnic-epp.json", "-r", "centralnic", "--loglevel", "debug"]
+nzrs_command: ["node", "./lib/rabbit-epp.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs", "--loglevel", "debug"]
+nzrs_healthcheck: ["CMD", "node", "./lib/healthcheck.js", "-j", "-f", "/nzrs-epp.json", "-r", "nzrs", "--loglevel", "debug"]
 
 nzrs_epp_server: srstestepp.srs.net.nz 
 nzrs_epp_port: 700

@@ -3,55 +3,15 @@
   hosts: "primary_manager:&{{ env_name }}"
   tasks:
 
-    - debug:
-        var: service_secrets
-    #- name: Gather list of docker secrets
-      #set_fact:
-        #known_secrets: "{{ api_secrets + nginx_secrets + celery_secrets + domaindb_secrets  }}"
-
-    #- name: Add centralnic secrets
-      #set_fact:
-        #known_secrets: "{{ known_secrets + centralnic_secrets }}"
-      #when: services.centralnic is defined
-
-    #- name: Add cocca secrets
-      #set_fact:
-        #known_secrets: "{{ known_secrets + cocca_secrets }}"
-      #when: services.cocca is defined
-
-    #- name: Add nzrs secrets
-      #set_fact:
-        #known_secrets: "{{ known_secrets + nzrs_secrets }}"
-      #when: services.nzrs is defined
-
-    #- name: Unique secrets
-      #set_fact:
-        #known_secrets: "{{ known_secrets|unique }}"
-
-    #- name: Add volumes to services
-      #set_fact:
-        #services: "{{ services | combine(service_volumes, recursive=True) }}"
-
-    #- name: Initialize list of known configs
-      #set_fact:
-        #known_configs: []
-
-    #- name: Load known configs for stack
-      #include: tasks/load-drs-configs.yml
-      #vars:
-        #service_config: "{{ item.value  }}"
-        #service_name: "{{ item.key }}"
-      #with_dict: "{{ configs }}"
-
-    #- name: Create docker compose spec
-      #template:
-        #src: templates/drs-stack.yml.j2
-        #dest: "{{ base_directory  }}/drs-stack.yml"
-      #notify:
-        #- deploy stack
-        #- nodepp version
-        #- api version
-        #- celery version
+    - name: Create docker compose spec
+      template:
+        src: templates/drs-stack.yml.j2
+        dest: "{{ base_directory  }}/drs-stack.yml"
+      notify:
+        - deploy stack
+        - nodepp version
+        - api version
+        - celery version
 
   handlers:
     - name: deploy stack

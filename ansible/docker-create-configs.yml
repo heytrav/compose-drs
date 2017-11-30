@@ -18,10 +18,6 @@
   hosts: "primary_manager:&{{ env_name }}"
   tasks:
 
-    - name: Initialize list of known configs
-      set_fact:
-        known_configs: []
-
     - name: Register existing docker configs
       command: docker config ls --format  "{{ '{{' }}.Name{{  '}}' }}"
       register: existing_configs
@@ -37,19 +33,19 @@
     - name: Generate nginx site.conf config file
       template:
         src: templates/nginx.conf.j2
-        dest: "{{ base_directory  }}/{{ configs.nginx.file  }}"
+        dest: "{{ base_directory  }}/{{ nginx_config.meta.file  }}"
       notify:
         - create nginx
 
   handlers:
     - name: create cocca
-      command:  docker config create 'cocca-{{ configs.cocca.version  }}' "{{ base_directory  }}/{{ configs.cocca.file  }}"
+      command:  docker config create 'cocca-{{ cocca_config.meta.version  }}' "{{ base_directory  }}/{{ cocca_config.meta.file  }}"
 
     - name: create centralnic
-      command:  docker config create 'centralnic-{{ configs.centralnic.version  }}' "{{ base_directory  }}/{{ configs.centralnic.file  }}"
+      command:  docker config create 'centralnic-{{ centralnic_config.meta.version  }}' "{{ base_directory  }}/{{ centralnic_config.meta.file  }}"
 
     - name: create nzrs
-      command:  docker config create 'nzrs-{{ configs.nzrs.version  }}' "{{ base_directory  }}/{{ configs.nzrs.file  }}"
+      command:  docker config create 'nzrs-{{ nzrs_config.meta.version  }}' "{{ base_directory  }}/{{ nzrs_config.meta.file  }}"
 
     - name: create nginx
-      command:  docker config create 'nginx-{{ configs.nginx.version  }}' "{{ base_directory  }}/{{ configs.nginx.file  }}"
+      command:  docker config create 'nginx-{{ nginx_config.meta.version  }}' "{{ base_directory  }}/{{ nginx_config.meta.file  }}"

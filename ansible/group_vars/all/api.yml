@@ -1,0 +1,42 @@
+---
+api_service:
+  image: "{{ api_image }}"
+  command: "{{ api_command }}"
+  depends_on:
+    - rabbitmq
+    - domaindb
+  deploy:
+    replicas: 1
+    restart_policy:
+      condition: on-failure
+      delay: 10s
+    update_config:
+      delay: 5s
+      failure_action: pause
+      parallelism: 1
+  environment:
+    DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+    JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
+    MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+    MYSQL_HOST: domaindb
+    MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    MYSQL_USER_FILE: /run/secrets/mysql_user
+    RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+    RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+    RABBITMQ_DEFAULT_VHOST: /
+    RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_PORT: 5672
+    RELEASE_VERSION: "{{ api_version }}"
+    SENTRY_DSN_FILE: /run/secrets/domain_api_sentry_dsn
+    SENTRY_ENVIRONMENT: development
+  secrets:
+    - mysql_database
+    - mysql_user
+    - mysql_password
+    - domain_api_sentry_dsn
+    - django_secret_key
+    - jwt_secret_key
+    - rabbitmq_default_user
+    - rabbitmq_default_pass
+    - rabbitmq_erlang_cookie

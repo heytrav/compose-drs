@@ -1,0 +1,15 @@
+---
+domaindb_service:
+  image: "{{ mysql_image }}"
+  environment:
+    MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+    MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+    MYSQL_USER_FILE: /run/secrets/mysql_user
+  ports:
+    - 3306:3306
+  secrets:
+    - mysql_password
+    - mysql_root_password
+    - mysql_database
+    - mysql_user

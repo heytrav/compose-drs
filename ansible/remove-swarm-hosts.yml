@@ -4,11 +4,18 @@
   roles: [catalystcloud]
   vars:
     env_name: "staging"
+
   tasks:
     - include_vars:
         dir: 'group_vars/{{ env_name }}'
         ignore_files:
           - .vars.yml.swp
+
+    - include_vars:
+        dir: 'group_vars/catalystcloud'
+        ignore_files:
+          - .vars.yml.swp
+          - .all.yml.swp
 
     - include_vars:
         dir: 'group_vars/database'
@@ -20,6 +27,7 @@
 
     - name: Connect to Catalyst Cloud
       os_auth:
+
 
     - name: Remove floating ips from known_hosts
       known_hosts:

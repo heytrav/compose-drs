@@ -1,0 +1,24 @@
+---
+nginx_service:
+  image: "{{ nginx_image }}"
+  configs:
+    - source: "{{ nginx_config.meta.name }}-{{ nginx_config.meta.version  }}"
+      target: "{{ nginx_config.meta.target }}"
+  depends_on:
+    - api
+  deploy:
+    restart_policy:
+      condition: on-failure
+      delay: 10s
+  ports:
+    - 443:443
+  secrets:
+    - site.key
+    - site.crt
+
+nginx_config:
+  meta:
+    version: 1
+    name: nginx
+    file: site.conf
+    target: /etc/nginx/conf.d/site.conf

@@ -1,6 +1,6 @@
 - name: Create epp config for "{{ epp_config_name }}"
   template:
     src: templates/config.json.j2
-    dest: "{{ base_directory }}/{{ epp_service_config.file }}"
+    dest: "{{ base_directory }}/{{ epp_service_config.meta.file }}"
   notify: "create {{ epp_config_name }}"
 

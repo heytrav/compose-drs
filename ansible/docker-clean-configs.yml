@@ -8,9 +8,6 @@
       command: docker config ls --format  "{{ '{{' }}.Name{{  '}}' }}"
       register: existing_configs
 
-    - name: Initialize list of known configs
-      set_fact:
-        known_configs: []
 
     - name: Load known configs for stack
       include: tasks/load-drs-configs.yml

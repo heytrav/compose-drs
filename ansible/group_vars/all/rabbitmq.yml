@@ -1,0 +1,21 @@
+---
+rabbitmq_service:
+  image: "{{ rabbitmq_image }}"
+  deploy:
+    resources:
+      limits:
+        memory: 1048M
+  environment:
+    RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+    RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+    RABBITMQ_DEFAULT_VHOST: /
+    RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_PORT: 5672
+    RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 0.49
+  ports:
+    - 15672:15672
+  secrets:
+    - rabbitmq_default_user
+    - rabbitmq_default_pass
+    - rabbitmq_erlang_cookie

@@ -13,22 +13,28 @@ rabbitmq_host: rabbitmq
 rabbitmq_port: 5672
 rabbitmq_default_vhost: /
 
-registries:
-  - nzrs
-  - cocca
-  - centralnic
 
+rabbitmq_image:  rabbitmq:3.6-management-alpine
+nginx_image: nginx:stable-alpine
+mysql_image: mysql:latest
+memcached_image: memcached:alpine
+
+
+version: "3.3"
+core_services:
+  migrate: "{{ migrate_service }}"
+  rabbitmq: "{{ rabbitmq_service }}"
+  celery: "{{ celery_service }}"
+  nginx: "{{ nginx_service }}"
+  domaindb: "{{ domaindb_service }}"
+  memcached: "{{ memcached_service }}"
+  api: "{{ api_service }}"
 
 core_configs:
-  nginx:
-    file: site.conf
-    services:
-      - nginx
-    version: 1
-    compose:
-      target: /etc/nginx/conf.d/site.conf
+  nginx: "{{ nginx_config }}"
 
-services: "{{ core_services | combine(epp_services, recursive=True) | combine(volumes, recursive=True) }}"
-configs: "{{ core_configs | combine(epp_configs, recursive=True) }}"
-secrets: "{{ core_secrets | combine(epp_secrets, recursive=True) }}"
+services: "{{ core_services | combine(epp_services | default({}), recursive=True) | combine(volumes, recursive=True) }}"
+configs: "{{ core_configs | combine(epp_configs | default({}), recursive=True) }}"
+secrets: "{{ core_secrets | combine(epp_secrets | default({}), recursive=True) }}"
 service_secrets: "{{ services.values() | selectattr('secrets', 'defined') | sum(attribute='secrets', start=[]) |  unique | list  }}"
+config_set: "{{ services.values() | selectattr('configs', 'defined') | map(attribute='configs') |sum(start=[])  | map(attribute='source') | list }}"
