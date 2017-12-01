@@ -1,0 +1,29 @@
+- name: Set up the developer database on first run
+  hosts: "{{ env_name }}:&database"
+  become: no
+  environment:
+    MYSQL_USER: "{{ vault_mysql_user }}"
+    MYSQL_PASSWORD: "{{ vault_mysql_password }}"
+    MYSQL_DATABASE: "{{ vault_mysql_database }}"
+    MYSQL_HOST: "0.0.0.0"
+  vars_prompt:
+    - name: "drs_project_directory"
+      prompt: "Enter path to drs project directory"
+      default: "{{ lookup('env', 'HOME') }}/workspace/innovation/drs-project"
+
+
+  tasks:
+    - name: Set up developer virtual environment
+      pip:
+        chdir: "{{ drs_project_directory }}"
+        virtualenv: "{{ drs_project_directory }}/venv"
+        virtualenv_python: /usr/bin/python3
+        requirements: "{{ drs_project_directory }}/requirements.txt"
+
+    - name: Set up application database
+      django_manage:
+        app_path: "{{ drs_project_directory }}"
+        command: migrate
+        virtualenv: "{{ drs_project_directory }}/venv"
+
+
