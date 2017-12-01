@@ -9,14 +9,7 @@
       register: existing_configs
 
 
-    - name: Load known configs for stack
-      include: tasks/load-drs-configs.yml
-      vars:
-        service_config: "{{ item.value  }}"
-        service_name: "{{ item.key }}"
-      with_dict: "{{ configs  }}"
-
     - name: Remove unused configs
       with_items: "{{ existing_configs.stdout_lines }}" 
       command: docker config rm "{{ item }}"
-      when: item not in known_configs
+      when: item not in config_set

@@ -23,17 +23,19 @@
       register: existing_configs
 
     - name: Generate nodepp json config files
-      include: tasks/epp-config.yml
-      vars:
-        epp_service_config: "{{ configs[item]  }}"
-        epp_config_name: "{{ item }}"
-      when: item in services
-      with_items: "{{ registries }}"
+      template:
+        src: templates/config.json.j2
+        dest: "{{ base_directory }}/{{ item.value.meta.file }}"
+      with_dict: "{{ epp_configs }}"
+      when: "'{{ item.value.meta.name }}-{{ item.value.meta.version  }}' not in existing_configs"
+      notify: "create {{ item.key }}"
+
 
     - name: Generate nginx site.conf config file
       template:
         src: templates/nginx.conf.j2
         dest: "{{ base_directory  }}/{{ nginx_config.meta.file  }}"
+      when: "'{{ nginx_config.meta.name }}-{{ nginx_config.meta.version }}' not in existing_configs"
       notify:
         - create nginx
 
