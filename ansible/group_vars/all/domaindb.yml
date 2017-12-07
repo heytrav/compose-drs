@@ -13,3 +13,6 @@ domaindb_service:
     - mysql_root_password
     - mysql_database
     - mysql_user
+
+mysql_user: admin
+mysql_database: domain_lab

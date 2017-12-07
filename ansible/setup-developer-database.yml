@@ -2,10 +2,10 @@
   hosts: "{{ env_name }}:&database"
   become: no
   environment:
-    MYSQL_USER: "{{ vault_mysql_user }}"
+    MYSQL_USER: "{{ mysql_user }}"
     MYSQL_PASSWORD: "{{ vault_mysql_password }}"
-    MYSQL_DATABASE: "{{ vault_mysql_database }}"
-    MYSQL_HOST: "0.0.0.0"
+    MYSQL_DATABASE: "{{ mysql_database }}"
+    MYSQL_HOST: "{{ mysql_host }}"
   vars_prompt:
     - name: "drs_project_directory"
       prompt: "Enter path to drs project directory"
