@@ -50,12 +50,14 @@
 
     - name: Remove ports
       os_port:
+        auth: "{{ auth }}"
         name: "{{ item.name }}"
         state: absent
       with_items: "{{ cc_servers }}"
 
     - name: Remove volumes
       os_volume:
+        auth: "{{ auth }}"
         name: "{{ item.name }}-data"
         state: absent
       with_items: "{{ cc_servers }}"
@@ -63,21 +65,25 @@
 
     - name: Remove swarm keypair
       os_keypair: 
+        auth: "{{ auth }}"
         state: absent
         name: "{{ cc_default_keypair_name }}"
 
     - name: Remove swarm router
       os_router:
+        auth: "{{ auth }}"
         state: absent
         name: "{{ cc_router_name }}"
 
     - name: Remove swarm network
       os_network:
+        auth: "{{ auth }}"
         state: absent
         name: "{{ cc_network_name }}"
 
     - name: Remove security group
       os_security_group:
+        auth: "{{ auth }}"
         name: "{{ item }}"
         state: absent
       with_items: "{{ cc_security_group_names }}"
