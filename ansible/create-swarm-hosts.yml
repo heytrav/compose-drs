@@ -2,7 +2,12 @@
 - name: Deploy set of networked host machines as swarm nodes
   hosts: localhost
   roles: [catalystcloud]
-  gather_facts: true
+  gather_facts: false
+  environment:
+    OS_AUTH_URL: "{{ lookup('env', 'OS_AUTH_URL') }}"
+    OS_PROJECT_NAME: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
+    OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
+    OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
   tags:
     - provision
   vars:
@@ -58,24 +63,24 @@
         marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
       with_items: "{{ cc_servers }}"
 
-
-- name: Install python on new hosts
-  hosts: "{{ env_name }}"
-  become: yes
-  roles: [common]
-  gather_facts: false
-  tags:
-    - provision
-    - firstonly
-  tasks:
-    - include: roles/common/tasks/install-python.yml
-
 - name: Basic host setup
   hosts: "{{ env_name }}:&catalystcloud"
   become: true
-  roles: [catalystcloud]
-  gather_facts: true
+  roles: [catalystcloud,common]
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: /usr/bin/python
+  pre_tasks:
+
+    - name: Update apt cache
+      raw: apt update -y
+
+    - include: roles/common/tasks/install-python.yml
+
   tasks:
+    - name: Gather facts
+      setup:
+
     - name: Create cc_servers list
       set_fact:
         cc_servers: "{{ [{'name': '{{ ansible_hostname }}', 'ip': '{{ hostvars[ansible_hostname].ansible_host }}'} | combine(appliance_default, recursive=True)] }}"
@@ -105,6 +110,8 @@
 
 - name: Setup swarm cluster
   hosts: "primary_manager:&{{ env_name }}"
+  become: yes
+  become_user: ubuntu
   tags: 
     - swarm 
     - init
@@ -137,6 +144,7 @@
 
 - name: Set up alternate managers
   hosts: "{{ env_name }}:&manager:!primary_manager"
+  become_user: ubuntu
   tags:
     - swarm
     - manager
@@ -153,6 +161,7 @@
 
 - name: Set up workers
   hosts: "{{ env_name }}:&worker"
+  become_user: ubuntu
   tags:
     - swarm
     - worker
@@ -166,6 +175,7 @@
 
 - name: Set labels on db nodes
   hosts: "primary_manager:&{{ env_name }}"
+  become_user: ubuntu
   tags: 
     - swarm 
     - init

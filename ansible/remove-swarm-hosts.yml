@@ -2,13 +2,13 @@
 - name: Terminate swarm hosts and remove all networks, security groups, etc.
   hosts: localhost
   roles: [catalystcloud]
+  environment:
+    OS_AUTH_URL: "{{ lookup('env', 'OS_AUTH_URL') }}"
+    OS_PROJECT_NAME: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
+    OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
+    OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
   vars:
     env_name: "staging"
-    auth:
-      password: "{{ lookup('env', 'OS_PASSWORD') }}"
-      username:  "{{ lookup('env', 'OS_USERNAME') }}"
-      auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
-      project_name: "{{ lookup('env', 'OS_TENANT_NAME') }}"
 
   tasks:
     - include_vars:
@@ -32,7 +32,7 @@
 
     - name: Connect to Catalyst Cloud
       os_auth:
-        auth: "{{ auth }}"
+        #auth: "{{ auth }}"
 
     - name: Remove floating ips from known_hosts
       known_hosts:
@@ -42,7 +42,7 @@
 
     - name: Remove swarm servers
       os_server:
-        auth: "{{ auth }}"
+        #auth: "{{ auth }}"
         name: "{{ item.name }}"
         state: absent
       with_items: "{{ cc_servers }}"
@@ -50,14 +50,14 @@
 
     - name: Remove ports
       os_port:
-        auth: "{{ auth }}"
+        #auth: "{{ auth }}"
         name: "{{ item.name }}"
         state: absent
       with_items: "{{ cc_servers }}"
 
     - name: Remove volumes
       os_volume:
-        auth: "{{ auth }}"
+        #auth: "{{ auth }}"
         name: "{{ item.name }}-data"
         state: absent
       with_items: "{{ cc_servers }}"
@@ -65,25 +65,25 @@
 
     - name: Remove swarm keypair
       os_keypair: 
-        auth: "{{ auth }}"
+        #auth: "{{ auth }}"
         state: absent
         name: "{{ cc_default_keypair_name }}"
 
     - name: Remove swarm router
       os_router:
-        auth: "{{ auth }}"
+        #auth: "{{ auth }}"
         state: absent
         name: "{{ cc_router_name }}"
 
     - name: Remove swarm network
       os_network:
-        auth: "{{ auth }}"
+        #auth: "{{ auth }}"
         state: absent
         name: "{{ cc_network_name }}"
 
     - name: Remove security group
       os_security_group:
-        auth: "{{ auth }}"
+        #auth: "{{ auth }}"
         name: "{{ item }}"
         state: absent
       with_items: "{{ cc_security_group_names }}"

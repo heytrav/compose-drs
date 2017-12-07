@@ -1,4 +1,5 @@
 ---
+ansible_python_interpreter: "{{ lookup('env', 'HOME') }}/workspace/catalystcloud-ansible/ansible-venv/bin/python"
 cc_ssh_user: "{{ lookup('env', 'USER') }}"
 base_directory: ~/workspace/innovation/compose-drs
 sentry_environment: development
