@@ -28,10 +28,3 @@
 - debug:
     msg: "{{ cc_servers }}" 
 
-- name: Setup floating ips array
-  set_fact:
-    cc_floating_ips: "{{ cc_floating_ips + [{'name': item.name, 'ip': hostvars[item.name].ansible_host}] }}"
-  with_items: "{{ cc_servers }}"
-
-- debug:
-    msg: "{{ cc_floating_ips }}"

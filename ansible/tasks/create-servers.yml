@@ -62,8 +62,21 @@
 - name: Assign floating ips
   os_floating_ip:
     state: present
-    floating_ip_address: "{{ item.ip }}"
     server: "{{ item.name }}"
+  register: floating_ip_info
   with_items:
-    - "{{ cc_floating_ips }}"
-  when: "cc_floating_ips is defined and (cc_floating_ips | length > 0)"
+    - "{{ cc_servers }}"
+
+- debug:
+    var: floating_ip_info
+
+#- name: Append floating ip to host info
+  #add_host:
+    #name: "{{ item.item.key }}"
+    #instance_name: "{{ item.item.value.instance_name }}"
+    #ansible_user: ubuntu
+    #ansible_host: "{{ analytics.server.private_v4 }}"
+    #ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    #groups: "analytics"
+    #private_ip: "{{ analytics.server.private_v4 }}"
+  #with_items: "{{ floating_ip_info.results }}"
