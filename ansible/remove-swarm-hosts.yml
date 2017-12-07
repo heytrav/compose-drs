@@ -4,6 +4,11 @@
   roles: [catalystcloud]
   vars:
     env_name: "staging"
+    auth:
+      password: "{{ lookup('env', 'OS_PASSWORD') }}"
+      username:  "{{ lookup('env', 'OS_USERNAME') }}"
+      auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env', 'OS_TENANT_NAME') }}"
 
   tasks:
     - include_vars:
@@ -27,6 +32,7 @@
 
     - name: Connect to Catalyst Cloud
       os_auth:
+        auth: "{{ auth }}"
 
     - name: Remove floating ips from known_hosts
       known_hosts:
