@@ -1,5 +1,9 @@
 ---
 
+api_image: "quay.io/heytrav/domain-api:{{ api_version }}"
+api_version: 1.2.22
+nodepp_image: "quay.io/heytrav/nodepp:{{ nodepp_version }}"
+nodepp_version: 1.2.8
 base_directory: "{{ ansible_env.HOME }}"
 sentry_environment: testing
 
