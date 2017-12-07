@@ -42,6 +42,7 @@
 
     - name: Remove swarm servers
       os_server:
+        auth: "{{ auth }}"
         name: "{{ item.name }}"
         state: absent
       with_items: "{{ cc_servers }}"
