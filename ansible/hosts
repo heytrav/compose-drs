@@ -1,3 +1,4 @@
+localhost ansible_connection=local
 manager1-staging ansible_host=150.242.40.212 fixed_ip=192.168.99.103
 manager2-staging ansible_host=150.242.40.218 fixed_ip=192.168.99.104
 worker1-staging ansible_host=150.242.40.216 fixed_ip=192.168.99.100
