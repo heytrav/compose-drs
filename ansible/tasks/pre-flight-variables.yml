@@ -25,6 +25,3 @@
   set_fact:
     cc_servers: "{{ managers + workers }}"
 
-- debug:
-    msg: "{{ cc_servers }}" 
-

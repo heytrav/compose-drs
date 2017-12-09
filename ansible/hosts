@@ -29,6 +29,8 @@ worker[1:3]-staging
 manager[1:2]-production
 worker[1:3]-production
 
+[development]
+localhost
 
 [staging]
 manager[1:2]-staging
