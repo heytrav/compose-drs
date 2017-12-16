@@ -1,6 +1,7 @@
 ---
 - name: Create network ports
   os_port:
+    validate_certs: false
     state: present
     admin_state_up: yes
     name: "{{ item.name }}"
@@ -12,6 +13,7 @@
 
 - name: Create volumes
   os_volume:
+    validate_certs: false
     display_name: "{{ item.name }}-data"
     size: "{{ item.volume_size_mb // 1024 }}"
   with_items: "{{ cc_servers }}"
@@ -19,6 +21,7 @@
 
 - name: Create servers
   os_server:
+    validate_certs: false
     state: present
     name: "{{ item.name }}"
     image: "{{ item.os_image | default(cc_default_os_image) }}"
@@ -53,15 +56,23 @@
 
 - name: Attach volume to server
   os_server_volume:
+    validate_certs: false
     volume: "{{ item.name }}-data"
     server: "{{ item.name }}"
     device: "{{ cc_volume_device_name }}"
   with_items: "{{ cc_servers }}"
   when: "item.volume_size_mb is defined"
 
+- debug:
+    var: item.name 
+  with_items: "{{ cc_servers }}"
+
 - name: Assign floating ips
   os_floating_ip:
+    validate_certs: false
     state: present
+    reuse: yes
+    wait: true
     server: "{{ item.name }}"
   register: floating_ip_info
   with_items:
@@ -70,13 +81,11 @@
 - debug:
     var: floating_ip_info
 
-#- name: Append floating ip to host info
-  #add_host:
-    #name: "{{ item.item.key }}"
-    #instance_name: "{{ item.item.value.instance_name }}"
-    #ansible_user: ubuntu
-    #ansible_host: "{{ analytics.server.private_v4 }}"
-    #ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
-    #groups: "analytics"
-    #private_ip: "{{ analytics.server.private_v4 }}"
-  #with_items: "{{ floating_ip_info.results }}"
+- name: Append floating ip to host info
+  add_host:
+    name: "{{ item.item.name }}"
+    ansible_host: "{{ item.floating_ip.floating_ip_address }}"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    groups: "analytics"
+    private_ip: "{{ analytics.server.private_v4 }}"
+  with_items: "{{ floating_ip_info.results }}"

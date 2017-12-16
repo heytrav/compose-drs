@@ -1,16 +1,23 @@
 
 - name: Connect to Catalyst Cloud
   os_auth:
+    validate_certs: false
 
+- name: Create keypair
+  os_keypair:
+    name: "{{ cc_default_keypair_name }}"
+    public_key: "{{ cc_default_keypair_pubkey }}"
+    validate_certs: false
 
-- include: roles/catalystcloud/tasks/create-keypair.yml
 - name: Create Network
   os_network:
     name: "{{ cc_network_name }}"
     state: present
+    validate_certs: false
 
 - name: Create subnet
   os_subnet:
+    validate_certs: false
     name: "{{ cc_subnet_name }}"
     network_name: "{{ cc_network_name }}"
     state: present
@@ -21,13 +28,34 @@
 
 - name: Create router
   os_router:
+    validate_certs: false
     state: present
     name: "{{ cc_router_name }}"
     network: "{{ cc_public_net_name }}"
     interfaces:
       - "{{ cc_subnet_name }}"
 
-- include: roles/catalystcloud/tasks/create-security-groups.yml
+- name: Create security groups
+  os_security_group:
+    validate_certs: false
+    state: present
+    name: "{{ item }}"
+  with_items: "{{ cc_security_group_names }}"
+  tags: security-groups
+
+- name: Add rules for security group
+  os_security_group_rule:
+    validate_certs: false
+    state: present
+    security_group: "{{ item.group }}"
+    protocol: "{{ item.proto | default('tcp') }}"
+    port_range_min: "{{ omit if item.port == 'any' else item.port }}"
+    port_range_max: "{{ omit if item.port == 'any' else item.port_end | default(item.port) }}"
+    remote_ip_prefix: "{{ item.remote_ip_prefix | default(omit) }}"
+    remote_group: "{{ item.remote_group | default(omit) }}"
+  with_items: "{{ cc_security_groups }}"
+  tags: security-groups
+
 - include: tasks/create-servers.yml
 
 - wait_for:

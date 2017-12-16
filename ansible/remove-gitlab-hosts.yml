@@ -16,6 +16,7 @@
 
     - name: Connect to Catalyst Cloud
       os_auth:
+        validate_certs: false
 
     - name: Remove floating ips from known_hosts
       known_hosts:
@@ -25,6 +26,7 @@
 
     - name: Remove GitLab host machines
       os_server:
+        validate_certs: false
         name: "{{ item.name }}"
         state: absent
       with_items: "{{ cc_servers }}"
@@ -32,12 +34,14 @@
 
     - name: Remove ports
       os_port:
+        validate_certs: false
         name: "{{ item.name }}"
         state: absent
       with_items: "{{ cc_servers }}"
 
     - name: Remove volumes
       os_volume:
+        validate_certs: false
         name: "{{ item.name }}-data"
         state: absent
       with_items: "{{ cc_servers }}"
@@ -45,21 +49,25 @@
 
     - name: Remove GitLab key pair
       os_keypair: 
+        validate_certs: false
         state: absent
         name: "{{ cc_default_keypair_name }}"
 
     - name: Remove GitLab router
       os_router:
+        validate_certs: false
         state: absent
         name: "{{ cc_router_name }}"
 
     - name: Remove GitLab network
       os_network:
+        validate_certs: false
         state: absent
         name: "{{ cc_network_name }}"
 
     - name: Remove security group
       os_security_group:
+        validate_certs: false
         name: "{{ item }}"
         state: absent
       with_items: "{{ cc_security_group_names }}"
