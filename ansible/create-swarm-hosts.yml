@@ -68,8 +68,6 @@
   become: true
   roles: [catalystcloud,common]
   gather_facts: false
-  vars:
-    ansible_python_interpreter: /usr/bin/python
   pre_tasks:
 
     - name: Update apt cache
@@ -93,9 +91,6 @@
   tags: 
     - docker
   become: yes
-  gather_facts: true
-  vars:
-    ansible_python_interpreter: /usr/bin/python
   pre_tasks:
     - name: Add NZ locale to instances
       locale_gen: 
@@ -108,10 +103,11 @@
         line: "{{ hostvars[item].fixed_ip }} item"
       with_items: "{{ groups[env_name] }}"
 
+
 - name: Setup swarm cluster
   hosts: "primary_manager:&{{ env_name }}"
   become: yes
-  become_user: ubuntu
+  #become_user: ubuntu
   tags: 
     - swarm 
     - init
@@ -144,7 +140,7 @@
 
 - name: Set up alternate managers
   hosts: "{{ env_name }}:&manager:!primary_manager"
-  become_user: ubuntu
+  #become_user: ubuntu
   tags:
     - swarm
     - manager
@@ -161,7 +157,7 @@
 
 - name: Set up workers
   hosts: "{{ env_name }}:&worker"
-  become_user: ubuntu
+  #become_user: ubuntu
   tags:
     - swarm
     - worker
@@ -184,4 +180,3 @@
     - name: Set db nodes with database role
       command: docker node update --label-add role=database {{ item }}
       with_items: "{{ env_db_managers }}"
-        

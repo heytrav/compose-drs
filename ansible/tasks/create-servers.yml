@@ -6,8 +6,8 @@
     admin_state_up: yes
     name: "{{ item.name }}"
     security_groups: "{{ item.security_groups }}"
-    fixed_ips:
-     - {ip_address: "{{ item.ip }}"}
+    #fixed_ips:
+     #- {ip_address: "{{ item.ip }}"}
     network: "{{ cc_network_name }}"
   with_items: "{{ cc_servers }}"
 
@@ -85,7 +85,7 @@
   add_host:
     name: "{{ item.item.name }}"
     ansible_host: "{{ item.floating_ip.floating_ip_address }}"
+    fixed_ip: "{{ item.floating_ip.fixed_ip_address }}"
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
-    groups: "analytics"
-    private_ip: "{{ analytics.server.private_v4 }}"
+    ansible_python_interpreter: /usr/bin/python
   with_items: "{{ floating_ip_info.results }}"
