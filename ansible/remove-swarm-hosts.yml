@@ -2,11 +2,11 @@
 - name: Terminate swarm hosts and remove all networks, security groups, etc.
   hosts: localhost
   roles: [catalystcloud]
-  environment:
-    OS_AUTH_URL: "{{ lookup('env', 'OS_AUTH_URL') }}"
-    OS_PROJECT_NAME: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
-    OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
-    OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
+  #environment:
+    #OS_AUTH_URL: "{{ lookup('env', 'OS_AUTH_URL') }}"
+    #OS_PROJECT_NAME: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
+    #OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
+    #OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
   vars:
     env_name: "staging"
   tasks:
