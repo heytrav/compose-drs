@@ -1,0 +1,13 @@
+
+
+- name: Preload all necessary appliance variables
+  hosts: "{{ env_name }}"
+  gather_facts: false
+  tags:
+    - preflight
+  tasks:
+    - name: Setup server spec for each machine
+      set_fact:
+        server_spec: "{{ appliance_default | combine({'name': inventory_hostname}, recursive=True) }}"
+
+

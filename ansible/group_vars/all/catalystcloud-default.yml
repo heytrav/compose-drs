@@ -1,0 +1,20 @@
+---
+
+suffix: "-{{ env_name }}"
+cc_default_keypair_name: "swarm-key{{ suffix }}"
+cc_default_keypair_pubkey_file: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa.pub"
+cc_default_keypair_pubkey: "{{ lookup('file', cc_default_keypair_pubkey_file) }}"
+ssh_remote_cidr: "{{ lookup('dig', 'myip.opendns.com', '@resolver1.opendns.com') + '/32' | default('0.0.0.0/0', true) }}"
+cc_subnet_prefix: 192.168.99
+cc_network_name: "swarm-net{{ suffix }}"
+cc_subnet_name: "swarm-subnet{{ suffix }}"
+cc_router_name: "swarm-router{{ suffix }}"
+cc_subnet_cidr: "{{ cc_subnet_prefix }}.0/24"
+cc_subnet_dhcp_start: "{{ cc_subnet_prefix }}.98"
+cc_subnet_dhcp_end: "{{ cc_subnet_prefix }}.200"
+cc_default_os_image: ubuntu-16.04-x86_64
+cc_default_flavor: c1.c1r1
+cc_ssh_user: ubuntu
+cc_volume_device_name: /dev/vdb
+cc_volume_group_name: data
+cc_default_volume_size: 15048

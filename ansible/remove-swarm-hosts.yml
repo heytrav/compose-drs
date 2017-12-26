@@ -1,33 +1,35 @@
 ---
+
+- include: preflight.yml
+
 - name: Terminate swarm hosts and remove all networks, security groups, etc.
   hosts: localhost
   roles: [catalystcloud]
-  #environment:
-    #OS_AUTH_URL: "{{ lookup('env', 'OS_AUTH_URL') }}"
-    #OS_PROJECT_NAME: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
-    #OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
-    #OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
   vars:
     env_name: "staging"
+    host_set: "{{ groups[env_name] | default([env_name]) }}"
+    cc_servers: "{{ host_set|map('extract', hostvars, 'server_spec') | list }}"
+    cc_security_groups: "{{ host_set| map('extract', hostvars, 'security_groups') |sum(start=[]) | unique | list }}"
+    cc_security_group_names: "{{ cc_security_groups | map(attribute='group') | unique | list }}"
   tasks:
-    - include_vars:
-        dir: 'group_vars/{{ env_name }}'
-        ignore_files:
-          - .vars.yml.swp
+    #- include_vars:
+        #dir: 'group_vars/{{ env_name }}'
+        #ignore_files:
+          #- .vars.yml.swp
 
-    - include_vars:
-        dir: 'group_vars/catalystcloud'
-        ignore_files:
-          - .vars.yml.swp
-          - .all.yml.swp
+    #- include_vars:
+        #dir: 'group_vars/catalystcloud'
+        #ignore_files:
+          #- .vars.yml.swp
+          #- .all.yml.swp
 
-    - include_vars:
-        dir: 'group_vars/database'
-        name: db
-        ignore_files:
-          - .all.yml.swp
+    #- include_vars:
+        #dir: 'group_vars/database'
+        #name: db
+        #ignore_files:
+          #- .all.yml.swp
 
-    - include: tasks/pre-flight-variables.yml
+    #- include: tasks/pre-flight-variables.yml
 
     - name: Connect to Catalyst Cloud
       os_auth:
@@ -39,21 +41,13 @@
         state: absent
       with_items: "{{ cc_servers }}"
 
-    - name: Remove floating ip
-      os_floating_ip:
-        validate_certs: false
-        state: absent
-        server: "{{ item.name }}"
-      with_items:
-        - "{{ cc_servers }}"
-
     - name: Remove swarm servers
       os_server:
         validate_certs: false
         name: "{{ item.name }}"
         state: absent
+        delete_fip: true
       with_items: "{{ cc_servers }}"
-
 
     - name: Remove ports
       os_port:
@@ -97,10 +91,10 @@
 
     - name: Remove hosts from local ~/.ssh/config
       blockinfile:
-        dest: "{{ base_directory }}/.ssh/config"
+        dest: "{{  lookup('env', 'HOME')  }}/.ssh/config"
         state: absent
-        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
-      with_items: "{{ env_managers + env_db_managers + env_workers }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
+      with_items: "{{ cc_servers }}"
 
     - name: Remove host from /etc/hosts
       become: yes
@@ -108,5 +102,5 @@
         dest: /etc/hosts
         state: absent
         insertafter: EOF
-        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
-      with_items: "{{ env_managers + env_db_managers + env_workers }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
+      with_items: "{{ cc_servers }}"

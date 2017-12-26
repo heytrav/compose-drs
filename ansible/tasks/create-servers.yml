@@ -15,7 +15,7 @@
   os_volume:
     validate_certs: false
     display_name: "{{ item.name }}-data"
-    size: "{{ item.volume_size_mb // 1024 }}"
+    size: "{{ (item.volume_size_mb | int) // 1024 }}"
   with_items: "{{ cc_servers }}"
   when: "item.volume_size_mb is defined"
 
@@ -35,7 +35,7 @@
     userdata: |
                #cloud-config
                users:
-               - name: "{{ cc_ssh_user }}"
+               - name: "{{ hostvars[item.name].cc_ssh_user }}"
                  shell: /bin/bash
                  lock_passwd: true
                  sudo: ALL=(ALL) NOPASSWD:ALL
@@ -63,10 +63,6 @@
   with_items: "{{ cc_servers }}"
   when: "item.volume_size_mb is defined"
 
-- debug:
-    var: item.name 
-  with_items: "{{ cc_servers }}"
-
 - name: Assign floating ips
   os_floating_ip:
     validate_certs: false
@@ -77,9 +73,6 @@
   register: floating_ip_info
   with_items:
     - "{{ cc_servers }}"
-
-- debug:
-    var: floating_ip_info
 
 - name: Append floating ip to host info
   add_host:
