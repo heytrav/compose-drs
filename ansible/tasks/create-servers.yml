@@ -6,8 +6,6 @@
     admin_state_up: yes
     name: "{{ item.name }}"
     security_groups: "{{ item.security_groups }}"
-    #fixed_ips:
-     #- {ip_address: "{{ item.ip }}"}
     network: "{{ cc_network_name }}"
   with_items: "{{ cc_servers }}"
 

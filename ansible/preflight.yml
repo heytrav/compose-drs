@@ -1,7 +1,7 @@
 
 
 - name: Preload all necessary appliance variables
-  hosts: "{{ env_name }}"
+  hosts: "{{ env_name }}:&catalystcloud"
   gather_facts: false
   tags:
     - preflight

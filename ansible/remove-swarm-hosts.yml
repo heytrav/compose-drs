@@ -12,25 +12,6 @@
     cc_security_groups: "{{ host_set| map('extract', hostvars, 'security_groups') |sum(start=[]) | unique | list }}"
     cc_security_group_names: "{{ cc_security_groups | map(attribute='group') | unique | list }}"
   tasks:
-    #- include_vars:
-        #dir: 'group_vars/{{ env_name }}'
-        #ignore_files:
-          #- .vars.yml.swp
-
-    #- include_vars:
-        #dir: 'group_vars/catalystcloud'
-        #ignore_files:
-          #- .vars.yml.swp
-          #- .all.yml.swp
-
-    #- include_vars:
-        #dir: 'group_vars/database'
-        #name: db
-        #ignore_files:
-          #- .all.yml.swp
-
-    #- include: tasks/pre-flight-variables.yml
-
     - name: Connect to Catalyst Cloud
       os_auth:
         validate_certs: false
@@ -93,8 +74,8 @@
       blockinfile:
         dest: "{{  lookup('env', 'HOME')  }}/.ssh/config"
         state: absent
-        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
-      with_items: "{{ cc_servers }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
+      with_items: "{{ host_set }}"
 
     - name: Remove host from /etc/hosts
       become: yes
@@ -102,5 +83,5 @@
         dest: /etc/hosts
         state: absent
         insertafter: EOF
-        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item.name }}"
-      with_items: "{{ cc_servers }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
+      with_items: "{{ host_set }}"
