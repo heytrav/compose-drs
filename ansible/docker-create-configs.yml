@@ -17,6 +17,8 @@
 - name: Docker stack configuration
   hosts: "primary_manager:&{{ env_name }}"
   tasks:
+    - debug:
+        var: cc_ssh_user
 
     - name: Register existing docker configs
       command: docker config ls --format  "{{ '{{' }}.Name{{  '}}' }}"
@@ -25,29 +27,29 @@
     - name: Generate nodepp json config files
       template:
         src: templates/config.json.j2
-        dest: "{{ base_directory }}/{{ item.value.meta.file }}"
+        dest: "{{ ansible_env.HOME}}/{{ item.value.meta.file }}"
       with_dict: "{{ epp_configs }}"
-      when: "'{{ item.value.meta.name }}-{{ item.value.meta.version  }}' not in existing_configs"
+      when: "'item.value.meta.name-item.value.meta.version' not in existing_configs"
       notify: "create {{ item.key }}"
 
 
     - name: Generate nginx site.conf config file
       template:
         src: templates/nginx.conf.j2
-        dest: "{{ base_directory  }}/{{ nginx_config.meta.file  }}"
-      when: "'{{ nginx_config.meta.name }}-{{ nginx_config.meta.version }}' not in existing_configs"
+        dest: "{{ ansible_env.HOME  }}/{{ nginx_config.meta.file  }}"
+      when: "'nginx_config.meta.name-nginx_config.meta.version' not in existing_configs"
       notify:
         - create nginx
 
   handlers:
     - name: create cocca
-      command:  docker config create 'cocca-{{ cocca_config.meta.version  }}' "{{ base_directory  }}/{{ cocca_config.meta.file  }}"
+      command:  docker config create 'cocca-{{ cocca_config.meta.version  }}' "{{ ansible_env.HOME  }}/{{ cocca_config.meta.file  }}"
 
     - name: create centralnic
-      command:  docker config create 'centralnic-{{ centralnic_config.meta.version  }}' "{{ base_directory  }}/{{ centralnic_config.meta.file  }}"
+      command:  docker config create 'centralnic-{{ centralnic_config.meta.version  }}' "{{ ansible_env.HOME  }}/{{ centralnic_config.meta.file  }}"
 
     - name: create nzrs
-      command:  docker config create 'nzrs-{{ nzrs_config.meta.version  }}' "{{ base_directory  }}/{{ nzrs_config.meta.file  }}"
+      command:  docker config create 'nzrs-{{ nzrs_config.meta.version  }}' "{{ ansible_env.HOME  }}/{{ nzrs_config.meta.file  }}"
 
     - name: create nginx
-      command:  docker config create 'nginx-{{ nginx_config.meta.version  }}' "{{ base_directory  }}/{{ nginx_config.meta.file  }}"
+      command:  docker config create 'nginx-{{ nginx_config.meta.version  }}' "{{ ansible_env.HOME  }}/{{ nginx_config.meta.file  }}"

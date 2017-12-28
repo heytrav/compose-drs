@@ -6,6 +6,7 @@
     MYSQL_PASSWORD: "{{ vault_mysql_password }}"
     MYSQL_DATABASE: "{{ mysql_database }}"
     MYSQL_HOST: "{{ mysql_host }}"
+    MYSQL_PORT: "{{ mysql_port }}"
   vars_prompt:
     - name: "drs_project_directory"
       prompt: "Enter path to drs project directory"
@@ -14,6 +15,7 @@
 
   tasks:
     - name: Set up developer virtual environment
+      delegate_to: localhost
       pip:
         chdir: "{{ drs_project_directory }}"
         virtualenv: "{{ drs_project_directory }}/venv"
@@ -21,9 +23,26 @@
         requirements: "{{ drs_project_directory }}/requirements.txt"
 
     - name: Set up application database
+      delegate_to: localhost
       django_manage:
         app_path: "{{ drs_project_directory }}"
         command: migrate
         virtualenv: "{{ drs_project_directory }}/venv"
+
+
+    - name: Load fixture data
+      delegate_to: localhost
+      django_manage:
+        app_path: "{{ drs_project_directory }}"
+        command: loaddata 
+        fixtures: "{{ item }}"
+        virtualenv: "{{ drs_project_directory }}/venv"
+      with_items:
+        - auth
+        - providers
+        - tlds
+        - tld_providers
+        - contact_types
+
 
 

@@ -1,53 +1,26 @@
 ---
 
+django_log_level: DEBUG
 api_image: "quay.io/heytrav/domain-api:{{ api_version }}"
 api_version: 1.2.22
 nodepp_image: "quay.io/heytrav/nodepp:{{ nodepp_version }}"
 nodepp_version: 1.2.8
-base_directory: "{{ lookup('env', 'HOME') }}"
+base_directory: "{{ ansible_env.HOME }}"
 sentry_environment: testing
 
-services:
-  rabbitmq: "{{ rabbitmq_service }}" 
-  domaindb: "{{ domaindb_service }}" 
-  nginx: "{{ nginx_service  }}"
-  memcached: "{{ memcached_service  }}"
-  migrate: "{{ migrate_service  }}"
-  celery: "{{ celery_service  }}"
-  api: "{{ api_service  }}"
-  centralnic: "{{ centralnic_service  }}"
-  nzrs: "{{ nzrs_service  }}"
-  cocca: "{{ cocca_service  }}"
+epp_services:
+  cocca: "{{ cocca_service }}"
+  centralnic: "{{ centralnic_service }}"
+  nzrs: "{{ nzrs_service }}"
 
-service_volumes:
+epp_configs:
+  cocca: "{{ cocca_config}}"
+  centralnic: "{{ centralnic_config }}"
+  nzrs: "{{ nzrs_config }}"
+
+epp_secrets: "{{ {} | combine(nzrs_secrets, recursive=True) | combine(cocca_secrets, recursive=True) | combine(centralnic_secrets, recursive=True) }}"
+
+volumes:
   domaindb:
     volumes:
       - /var/lib/mysql:/var/lib/mysql
-
-cocca_deploy:
-  replicas: 2
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause
-centralnic_deploy:
-  replicas: 2
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause
-nzrs_deploy:
-  replicas: 2
-  restart_policy:
-    condition: on-failure
-    delay: 10s
-  update_config:
-    parallelism: 1
-    delay: 5s
-    failure_action: pause

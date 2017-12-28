@@ -24,6 +24,6 @@ appliance_default:
   flavor: "{{ cc_flavor | default(cc_default_flavor) }}"
   os_image: "{{ cc_os_image | default(cc_default_os_image) }}"
   volume_size_mb: '{{ appliance_volume_size | default(cc_default_volume_size) | int }}'
-  security_groups: "default,{{ security_group_name }}"
+  security_groups: "default,{{ security_groups|map(attribute='group')|unique|list|join(',') }}"
   mounts: "{{ appliance_mounts | default(default_appliance_mounts) }}"
 

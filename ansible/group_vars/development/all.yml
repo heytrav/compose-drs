@@ -1,4 +1,6 @@
 ---
+mysql_host: 0.0.0.0
+django_log_level: DEBUG
 ansible_python_interpreter: "/home/travis/workspace/catalystcloud-ansible/ansible-venv/bin/python"
 cc_ssh_user: "{{ lookup('env', 'USER') }}"
 base_directory: ~/workspace/innovation/compose-drs

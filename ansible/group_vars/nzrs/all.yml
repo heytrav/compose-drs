@@ -1,36 +1,73 @@
 ---
-nzrs:
+nzrs_service:
+  image: "{{ nodepp_image }}"
+  command: "{{ nzrs_command }}"
+  configs:
+    - source: "{{ nzrs_config.meta.name }}-{{ nzrs_config.meta.version  }}"
+      target: "{{ nzrs_config.meta.target }}"
+  depends_on:
+    - rabbitmq
+  deploy:
+    replicas: 1
+    restart_policy:
+      condition: on-failure
+      delay: 10s
+    update_config:
+      delay: 5s
+      failure_action: pause
+      parallelism: 1
+  environment:
+    EPP_LOGIN_FILE: /run/secrets/nzrs_login
+    EPP_PASSWORD_FILE: /run/secrets/nzrs_password
+    RABBITMQ_DEFAULT_PASS_FILE: /run/secrets/rabbitmq_default_pass
+    RABBITMQ_DEFAULT_USER_FILE: /run/secrets/rabbitmq_default_user
+    RABBITMQ_DEFAULT_VHOST: /
+    RABBITMQ_ERLANG_COOKIE_FILE: /run/secrets/rabbitmq_erlang_cookie
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_PORT: 5672
+    RELEASE_VERSION: "{{ nodepp_version }}"
+    SENTRY_DSN_FILE: /run/secrets/nodepp_sentry_dsn
+  healthcheck:
+    interval: 1m
+    retries: 3
+    test: "{{ nzrs_healthcheck }}"
+    timeout: 20s
   secrets:
-    nzrs_login: "{{ vault_nzrs_login }}"
-    nzrs_password: "{{ vault_nzrs_password }}"
-    nzrs-epp.pem: "{{ vault_nzrs_epp_pem }}"
-    nzrs-epp.key: "{{ vault_nzrs_epp_key }}"
-  config:
+    - nzrs_login
+    - nzrs_password
+    - nodepp_sentry_dsn
+    - rabbitmq_default_user
+    - rabbitmq_default_pass
+
+
+nzrs_config:
+  meta:
+    version: 2
     name: nzrs
-    services:
-      - nzrs
     file: nzrs-epp.json
-    compose:
-      target: /nzrs-epp.json
-    version: 4
-    config:
-      host: "{{ nzrs_epp_server }}"
-      cert: /run/secrets/nzrs-epp.pem
-      key: /run/secrets/nzrs-epp.key
-      port: "{{ nzrs_epp_port }}"
-      ssl: true
-      services: "{{ nzrs_epp_services }}"
-      extensions:
-        - DNSSEC
-      extensionClasses:
-        - extension: DNSSEC
-          className: SecDnsExtension 
-      namespaces:
-        epp:
-          xmlns: urn:ietf:params:xml:ns:epp-1.0
-        domain:
-          xmlns: urn:ietf:params:xml:ns:domain-1.0
-        contact:
-          xmlns: urn:ietf:params:xml:ns:contact-1.0
-        DNSSEC:
-          xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+    target: /nzrs-epp.json
+  config:
+    host: "{{ nzrs_epp_server }}" 
+    port: "{{ nzrs_epp_port }}"
+    ssl: true
+    services: "{{ nzrs_epp_services }}"
+    extensions:
+      - DNSSEC
+    extensionClasses:
+      - extension: DNSSEC
+        className: SecDnsExtension 
+    namespaces:
+      epp:
+        xmlns: urn:ietf:params:xml:ns:epp-1.0
+      domain:
+        xmlns: urn:ietf:params:xml:ns:domain-1.0
+      contact:
+        xmlns: urn:ietf:params:xml:ns:contact-1.0
+      host:
+        xmlns: urn:ietf:params:xml:ns:host-1.0 
+      DNSSEC:
+        xmlns: urn:ietf:params:xml:ns:secDNS-1.1
+
+nzrs_secrets:
+  nzrs_login: "{{ vault_nzrs_login }}"
+  nzrs_password: "{{ vault_nzrs_password }}"

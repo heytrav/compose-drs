@@ -11,6 +11,7 @@ celery_service:
       delay: 10s
   environment:
     DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+    DJANGO_LOG_LEVEL: "{{ django_log_level }}"
     JWT_SECRET_KEY_FILE: /run/secrets/jwt_secret_key
     MYSQL_DATABASE_FILE: /run/secrets/mysql_database
     MYSQL_HOST: domaindb

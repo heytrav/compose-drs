@@ -1,5 +1,10 @@
 ---
 appliance_volume_size: 35028 
+
+database_security_group:
+  - {group: "swarm-{{ env_name }}-database-sg", port: 3306, remote_ip_prefix: "202.78.240.7/32"}
+
+appliance_security_groups: "{{ default_security_groups + database_security_group }}"
 appliance_mounts:
   - { name: "docker", path: "/var/lib/docker", size: "{{ docker_partition_size | default('10000m') }}", fstype: "ext4" }
   - { name: "mysql", path: "/var/lib/mysql", size: "{{ mysql_partition_size | default('20000m') }}", fstype: "btrfs" }
