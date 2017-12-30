@@ -1,7 +1,7 @@
 ---
 - name: Create a gitlab runner
   become: true
-  hosts: "{{ appliance_name }}"
+  hosts: "{{ env_name }}"
   tasks:
 
     - name: Register python test gitlab runner

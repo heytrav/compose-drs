@@ -74,7 +74,7 @@
 
     - name: Remove hosts from local ~/.ssh/config
       blockinfile:
-        dest: "{{ base_directory }}/.ssh/config"
+        dest: "{{ ansible_env.HOME }}/.ssh/config"
         state: absent
         marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ item }}"
       with_items: "{{ groups['gitlab'] }}"
