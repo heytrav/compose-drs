@@ -1,4 +1,4 @@
 ---
-ansible_user: ubuntu
+ansible_user: "{{ cc_ssh_user }}" 
 #ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %h:%p -q travis@wlg-bounce.wgtn.cat-it.co.nz"'
 ansible_ssh_common_args: '-o StrictHostKeyChecking=no'

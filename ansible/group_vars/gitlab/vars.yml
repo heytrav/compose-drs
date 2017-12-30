@@ -2,11 +2,11 @@
 
 cc_ssh_user: gitlab
 cc_subnet_prefix: 10.70.0
-
-gitlab_appliance_default:
+security_group_name: drs-gitlab-sg
+appliance_default:
   flavor: c1.c1r4
   os_image: "{{ cc_default_os_image }}"
-  volume_size_mb: 20048
+  volume_size_mb: 25048
   security_groups: "default,{{ security_group_name }}"
   mounts:
     - { name: "opt", path: "/opt", size: "5000m", fstype: "btrfs" }

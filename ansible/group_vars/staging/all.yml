@@ -1,5 +1,5 @@
 ---
-
+cc_ssh_user: ubuntu
 django_log_level: DEBUG
 api_image: "quay.io/heytrav/domain-api:{{ api_version }}"
 api_version: 1.2.22
